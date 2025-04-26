@@ -1,0 +1,12 @@
+openapi: 3.1.0
+info:
+  title: artis-libri API
+  version: "1.0"
+  description: 技術書庫アプリのAPI仕様書です
+  contact:
+    name: Daichi Sugiyama
+paths:
+  $ref: "paths/book/books.yaml"
+tags:
+  - name: books
+    description: 書籍に関するAPI群

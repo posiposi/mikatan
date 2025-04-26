@@ -1,0 +1,9 @@
+description: Success
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 正常に処理が完了しました

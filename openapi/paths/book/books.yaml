@@ -1,0 +1,31 @@
+/v1/books/{id}:
+  delete:
+    summary: 書籍削除API
+    operationId: delete.books
+    description: 該当id書籍を削除する
+    tags:
+      - books
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: 書籍ID
+        examples:
+          id:
+            value: "1"
+            summary: 書籍ID
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message: { type: string, example: "書籍を削除しました。" }
+      "400":
+        $ref: "../../components/responses/common/400BadRequest.yaml"
+      "404":
+        $ref: "../../components/responses/book/404NotFoundBook.yaml"

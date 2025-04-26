@@ -1,0 +1,7 @@
+title: Not Found
+type: object
+description: 404Error Response
+properties:
+  message: { type: string, example: "リソースが見つかりませんでした。" }
+required:
+  - message

@@ -1,0 +1,17 @@
+type: object
+description: 書籍
+required:
+  - id
+properties:
+  id: { type: string, example: 書籍ID }
+  title: { type: string, example: タイトル }
+  genre: { type: string, example: ジャンル }
+  total_page: { type: int, example: 総ページ数 }
+  progress_page: { type: int, example: 進捗ページ数 }
+  progress_percentage: { type: int, example: 進捗率 }
+  price: { type: int, example: 価格 }
+  author: { type: string, example: 著者 }
+  publisher: { type: string, example: 出版社 }
+  published_at: { type: string, example: 出版日 }
+  created_at: { type: string, example: 作成日 }
+  updated_at: { type: string, example: 更新日 }

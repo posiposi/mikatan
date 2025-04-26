@@ -1,0 +1,7 @@
+titel: Bad Request
+type: object
+description: 400Error Response
+properties:
+  message: { type: string, example: "リクエストが不正です。" }
+required:
+  - message

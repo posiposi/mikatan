@@ -1,0 +1,102 @@
+services:
+  db:
+    image: mysql:8.4.5
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - ${MYSQL_PORT}:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - app_network
+
+  backend:
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend/:/go/src/
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    tty: true
+    stdin_open: true
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    env_file:
+      - .env
+    networks:
+      - app_network
+
+  frontend:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    tty: true
+    stdin_open: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+  redoc:
+    image: redocly/redoc
+    container_name: "redoc"
+    ports:
+      - "8082:80"
+    volumes:
+      - ./openapi:/usr/share/nginx/html/openapi
+    environment:
+      SPEC_URL: openapi/openapi.yaml
+
+  prism:
+    image: stoplight/prism:4
+    command: "mock -h 0.0.0.0 /openapi/openapi.yaml"
+    volumes:
+      - ./openapi:/openapi
+    ports:
+      - "4010:4010"
+
+  schemaspy:
+    image: schemaspy/schemaspy:snapshot
+    depends_on:
+      - db
+    volumes:
+      - ./schemaspy/output:/output
+    networks:
+      - app_network
+    # .envを参照するためschemaspy.propertiesは使用しない
+    command: >
+      java -jar schemaspy.jar
+      - vizjs
+      -t mysql
+      -dp mysql-connector-java.jar
+      -host db
+      -port ${MYSQL_PORT}
+      -db ${MYSQL_DATABASE}
+      -u ${MYSQL_USER}
+      -p ${MYSQL_PASSWORD}
+      -s ${MYSQL_DATABASE}
+
+  schemaspy_nginx:
+    image: nginx
+    depends_on:
+      - schemaspy
+    ports:
+      - 8088:80
+    volumes:
+      - ./schemaspy/output:/usr/share/nginx/html:ro
+
+volumes:
+  mysql_data:
+
+networks:
+  app_network:

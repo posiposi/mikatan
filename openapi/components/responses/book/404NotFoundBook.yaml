@@ -1,0 +1,9 @@
+description: Book Not Found
+content:
+  application/json:
+    schema:
+      $ref: "../../schemas/common/404NotFound.yaml"
+    examples:
+      bookNotFound:
+        value:
+          message: "該当書籍が見つかりませんでした。"
