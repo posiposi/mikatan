@@ -8,47 +8,23 @@ datasource db {
 }
 
 model User {
-  id         String    @id @db.Char(36)
+  user_id    String    @id @db.Char(36)
+  name       String    @default("")
   email      String
   password   String
   created_at DateTime  @default(now())
   updated_at DateTime?
 
-  // TODO 要bookとのリレーション
-  book Reading[]
-
   @@map("users")
 }
 
-model Book {
-  id           String    @id @db.Char(36)
-  title        String    @default("")
-  genre        String    @default("")
-  total_page   Int       @default(0)
-  author       String    @default("")
-  publisher    String    @default("")
-  published_at Int       @db.Year
-  price        Decimal   @default(0) @db.Decimal(10, 2)
-  created_at   DateTime  @default(now())
-  updated_at   DateTime?
+model Item {
+  item_id     String    @id @db.Char(36)
+  item_name   String    @default("")
+  stock       Boolean   @default(true)
+  description String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
 
-  // TODO 要userとのリレーション
-  user Reading[]
-
-  @@map("books")
-}
-
-model Reading {
-  user_id       String    @db.Char(36)
-  book_id       String    @db.Char(36)
-  progress_page Int       @default(0)
-  review        String?
-  created_at    DateTime  @default(now())
-  updated_at    DateTime?
-
-  book Book  @relation(fields: [book_id], references: [id])
-  User User? @relation(fields: [user_id], references: [id])
-
-  @@id([book_id, user_id])
-  @@map("readings")
+  @@map("items")
 }
