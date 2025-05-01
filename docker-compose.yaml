@@ -20,16 +20,13 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend/:/go/src/
+      - .env:/go/src/.env
     ports:
       - "8080:8080"
     depends_on:
       - db
     tty: true
     stdin_open: true
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-    env_file:
-      - .env
     networks:
       - app_network
 
