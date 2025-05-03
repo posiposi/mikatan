@@ -1,30 +1,29 @@
-delete:
-  summary: 商品削除API
-  operationId: delete.items
-  description: 該当id商品を削除する
-  tags:
-    - items
-  parameters:
-    - name: id
-      in: path
-      required: true
-      schema:
-        type: string
-      description: 商品ID
-      examples:
-        id:
-          value: "1"
-          summary: 商品ID
+get:
+  summary: 全商品取得API
+  description: itemsテーブルに存在する全商品を取得する
   responses:
     "200":
-      description: OK
+      description: Success
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              message: { type: string, example: "商品を削除しました。" }
-    "400":
-      $ref: "../../components/responses/common/400BadRequest.yaml"
-    "404":
-      $ref: "../../components/responses/item/404NotFoundItem.yaml"
+            type: array
+            items:
+              $ref: "../../components/schemas/item/item.yaml"
+          examples:
+            items:
+              value:
+                - item_id: "1"
+                  user_id: "1"
+                  item_name: "商品名1"
+                  stock: true
+                  description: "商品説明1"
+                  created_at: "2023-01-01 00:00:00"
+                  updated_at: "2023-01-01 00:00:00"
+                - item_id: "2"
+                  user_id: "2"
+                  item_name: "商品名2"
+                  stock: false
+                  description: "商品説明2"
+                  created_at: "2023-01-02 00:00:00"
+                  updated_at: "2023-01-02 00:00:00"
