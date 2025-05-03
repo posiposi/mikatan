@@ -8,23 +8,28 @@ datasource db {
 }
 
 model User {
-  user_id    String    @id @db.Char(36)
-  name       String    @default("")
-  email      String
-  password   String
-  created_at DateTime  @default(now())
-  updated_at DateTime?
+  userId    String    @id @map("user_id") @db.Char(36)
+  name      String    @default("")
+  email     String
+  password  String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+
+  items Item[]
 
   @@map("users")
 }
 
 model Item {
-  item_id     String    @id @db.Char(36)
-  item_name   String    @default("")
+  itemId      String    @id @map("item_id") @db.Char(36)
+  userId      String    @map("user_id") @db.Char(36)
+  itemName    String    @default("") @map("item_name")
   stock       Boolean   @default(true)
   description String?
-  created_at  DateTime  @default(now())
-  updated_at  DateTime?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @map("updated_at")
+
+  user User? @relation(fields: [userId], references: [userId])
 
   @@map("items")
 }
