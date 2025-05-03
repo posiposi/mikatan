@@ -1,0 +1,12 @@
+type: object
+description: 商品
+required:
+  - id
+properties:
+  item_id: { type: string, example: 商品ID }
+  user_id: { type: string, example: ユーザーID }
+  item_name: { type: string, example: 商品名 }
+  stock: { type: boolean, example: 在庫 }
+  description: { type: string, example: 商品説明 }
+  created_at: { type: string, example: 作成日 }
+  updated_at: { type: string, example: 更新日 }

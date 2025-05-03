@@ -1,12 +1,20 @@
 openapi: 3.1.0
 info:
-  title: artis-libri API
+  title: mikatan API
   version: "1.0"
-  description: 技術書庫アプリのAPI仕様書です
+  description: みかたんにってぃんぐのAPI仕様書です
   contact:
     name: Daichi Sugiyama
+servers:
+  - url: https://mikatan_knitting/v1
+    description: Production
+  - url: http://localhost:8080/v1
+    description: Local
 paths:
-  $ref: "paths/book/books.yaml"
+  /items:
+    $ref: "./paths/item/items.yaml"
+  /items/{item_id}:
+    $ref: "./paths/item/items_itemId.yaml"
 tags:
-  - name: books
-    description: 書籍に関するAPI群
+  - name: items
+    description: 商品に関するAPI群
