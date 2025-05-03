@@ -1,9 +1,9 @@
 type: object
-description: 書籍
+description: 商品
 required:
   - id
 properties:
-  id: { type: string, example: 書籍ID }
+  id: { type: string, example: 商品ID }
   title: { type: string, example: タイトル }
   genre: { type: string, example: ジャンル }
   total_page: { type: int, example: 総ページ数 }

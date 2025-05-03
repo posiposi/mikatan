@@ -2,4 +2,4 @@ description: Success
 content:
   application/json:
     schema:
-      $ref: "../../schemas/book/books.yaml"
+      $ref: "../../schemas/item/items.yaml"
