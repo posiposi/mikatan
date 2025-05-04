@@ -92,8 +92,24 @@ services:
     volumes:
       - ./schemaspy/output:/usr/share/nginx/html:ro
 
+  test_db:
+    image: mysql:8.4.5
+    environment:
+      MYSQL_USER: ${MYSQL_TEST_USER}
+      MYSQL_PASSWORD: ${MYSQL_TEST_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_TEST_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_TEST_ROOT_PASSWORD}
+    ports:
+      - ${MYSQL_TEST_PORT}:3306
+    volumes:
+      - test_mysql_data:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - app_network
+
 volumes:
   mysql_data:
+  test_mysql_data:
 
 networks:
   app_network:
