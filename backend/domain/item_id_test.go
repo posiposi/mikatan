@@ -20,7 +20,7 @@ func TestItemIdError(t *testing.T) {
 	}
 }
 
-func TestValue(t *testing.T) {
+func TestItemIdValue(t *testing.T) {
 	value := uuid.NewString()
 	itemId, _ := NewItemId(value)
 	if itemId.Value() != value {
