@@ -11,11 +11,11 @@ import (
 
 func (m *DBManager) seedUsers() error {
 	log.Println("User Seeder Start!")
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		id := uuid.NewString()
 		name := "test_user" + strconv.Itoa(i)
 		user := model.User{
-			Id:        id,
+			UserId:    id,
 			Name:      name,
 			Email:     name + "@example.com",
 			Password:  "password",
