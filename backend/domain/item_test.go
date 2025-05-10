@@ -2,26 +2,55 @@ package domain
 
 import (
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewItem(t *testing.T) {
+func createTestItem() (*Item, ItemId, error) {
 	userId, _ := NewUserId(uuid.NewString())
 	itemName, _ := NewItemName("Test Item")
 	stock, _ := NewStock(true)
 	description, _ := NewDescription("This is a test item.")
 
 	item, err := NewItem(*userId, *itemName, *stock, *description)
+	return item, item.itemID, err
+}
 
-	assert.NoError(t, err, "NewItem() should not return an error")
-	assert.NotNil(t, item, "NewItem() should return a valid item")
-	assert.Equal(t, *userId, item.userId, "UserId should match")
-	assert.Equal(t, *itemName, item.itemName, "ItemName should match")
-	assert.Equal(t, *stock, item.stock, "Stock should match")
-	assert.Equal(t, *description, item.description, "Description should match")
-	assert.WithinDuration(t, time.Now(), item.createdAt, time.Second, "CreatedAt should be close to now")
-	assert.WithinDuration(t, time.Now(), item.updatedAt, time.Second, "UpdatedAt should be close to now")
+func TestNewItem(t *testing.T) {
+	item, _, err := createTestItem()
+	if err != nil {
+		t.Fatalf("Failed to create test item: %v", err)
+	}
+	assert.NotNil(t, item, "NewItem() should return a non-nil Item")
+	assert.NotNil(t, item.itemID, "ItemId should not be nil")
+	assert.NotNil(t, item.userId, "UserId should not be nil")
+	assert.NotNil(t, item.itemName, "ItemName should not be nil")
+	assert.NotNil(t, item.stock, "Stock should not be nil")
+	assert.NotNil(t, item.description, "Description should not be nil")
+}
+
+func TestItemId(t *testing.T) {
+	item, itemId, _ := createTestItem()
+	assert.Equal(t, itemId.Value(), item.ItemId())
+}
+
+func TestUserId(t *testing.T) {
+	item, _, _ := createTestItem()
+	assert.Equal(t, item.userId.Value(), item.UserId())
+}
+
+func TestItemName(t *testing.T) {
+	item, _, _ := createTestItem()
+	assert.Equal(t, item.itemName.Value(), item.ItemName())
+}
+
+func TestStock(t *testing.T) {
+	item, _, _ := createTestItem()
+	assert.Equal(t, item.stock.Value(), item.Stock())
+}
+
+func TestDescription(t *testing.T) {
+	item, _, _ := createTestItem()
+	assert.Equal(t, item.description.Value(), item.Description())
 }

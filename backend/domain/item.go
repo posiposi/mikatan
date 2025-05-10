@@ -33,3 +33,23 @@ func NewItem(userId UserId, itemName ItemName, stock Stock, description Descript
 	}
 	return item, nil
 }
+
+func (i *Item) ItemId() string {
+	return i.itemID.Value()
+}
+
+func (i *Item) UserId() string {
+	return i.userId.Value()
+}
+
+func (i *Item) ItemName() string {
+	return i.itemName.Value()
+}
+
+func (i *Item) Stock() bool {
+	return i.stock.Value()
+}
+
+func (i *Item) Description() string {
+	return i.description.Value()
+}

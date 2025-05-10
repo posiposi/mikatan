@@ -19,6 +19,6 @@ func NewItemId(value string) (*ItemId, error) {
 	return itemId, nil
 }
 
-func (itemId ItemId) Value() string {
+func (itemId *ItemId) Value() string {
 	return itemId.value
 }

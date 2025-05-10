@@ -22,6 +22,6 @@ func NewItemName(value string) (*ItemName, error) {
 	return itemName, nil
 }
 
-func (itemName ItemName) Value() string {
+func (itemName *ItemName) Value() string {
 	return itemName.value
 }

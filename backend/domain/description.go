@@ -22,6 +22,6 @@ func NewDescription(value string) (*Description, error) {
 	return description, nil
 }
 
-func (description Description) Value() string {
+func (description *Description) Value() string {
 	return description.value
 }

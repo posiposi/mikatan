@@ -10,6 +10,6 @@ func NewStock(value bool) (*Stock, error) {
 	return stock, nil
 }
 
-func (stock Stock) Value() bool {
+func (stock *Stock) Value() bool {
 	return stock.value
 }
