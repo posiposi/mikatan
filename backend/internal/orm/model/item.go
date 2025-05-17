@@ -7,9 +7,8 @@ import (
 )
 
 type Item struct {
-	gorm.Model
 	ItemId      string         `json:"itemId" gorm:"primaryKey"`
-	UserId      string         `json:"userId" gorm:"primaryKey;not null"`
+	UserId      string         `json:"userId" gorm:"size:36;not null"`
 	ItemName    string         `json:"itemName" gorm:"not null"`
 	Stock       bool           `json:"stock" gorm:"not null;default:true"`
 	Description string         `json:"description"`
