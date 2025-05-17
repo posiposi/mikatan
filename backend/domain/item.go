@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/posiposi/project/backend/dto"
 )
 
 type Item struct {
@@ -52,4 +53,16 @@ func (i *Item) Stock() bool {
 
 func (i *Item) Description() string {
 	return i.description.Value()
+}
+
+func (i *Item) ToDto() dto.ItemResponse {
+	return dto.ItemResponse{
+		ItemId:      i.itemID.Value(),
+		UserId:      i.userId.Value(),
+		ItemName:    i.itemName.Value(),
+		Stock:       i.stock.Value(),
+		Description: i.description.Value(),
+		CreatedAt:   i.createdAt,
+		UpdatedAt:   i.updatedAt,
+	}
 }
