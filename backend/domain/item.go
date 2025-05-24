@@ -18,13 +18,19 @@ type Item struct {
 	deletedAt   time.Time
 }
 
-func NewItem(userId UserId, itemName ItemName, stock Stock, description Description) (*Item, error) {
-	itemId, err := NewItemId(uuid.NewString())
-	if err != nil {
-		return nil, err
+func NewItem(itemId *ItemId, userId UserId, itemName ItemName, stock Stock, description Description) (*Item, error) {
+	var id ItemId
+	if itemId == nil {
+		newId, err := NewItemId(uuid.NewString())
+		if err != nil {
+			return nil, err
+		}
+		id = *newId
+	} else {
+		id = *itemId
 	}
 	item := &Item{
-		itemID:      *itemId,
+		itemID:      id,
 		userId:      userId,
 		itemName:    itemName,
 		stock:       stock,

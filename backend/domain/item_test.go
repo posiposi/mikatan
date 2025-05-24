@@ -13,7 +13,7 @@ func createTestItem() (*Item, ItemId, error) {
 	stock, _ := NewStock(true)
 	description, _ := NewDescription("This is a test item.")
 
-	item, err := NewItem(*userId, *itemName, *stock, *description)
+	item, err := NewItem(nil, *userId, *itemName, *stock, *description)
 	return item, item.itemID, err
 }
 
