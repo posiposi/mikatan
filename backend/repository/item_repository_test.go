@@ -1,41 +1,71 @@
 package repository
 
 import (
+	"fmt"
+	"log"
+	"os"
 	"testing"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"github.com/google/uuid"
+	"github.com/joho/godotenv"
+	"github.com/posiposi/project/backend/domain"
+	"github.com/posiposi/project/backend/internal/orm/model"
+	"github.com/stretchr/testify/assert"
 )
 
-var repo *itemRepository
+var repo IItemRepository
+var db *gorm.DB
 
-func testMain(m *testing.M) (*gorm.DB, error) {
-	// TODO GitHub ActionsでのCI/CDを考慮して、テスト用DBの接続情報を環境変数から取得するようにする
-	dsn := "root:test_root_pass@tcp(test_db:3307)/test_db?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+func TestMain(m *testing.M) {
+	err := godotenv.Load("../.env")
 	if err != nil {
-		return nil, err
+		log.Fatalln("Error loading .env file")
 	}
-
-	// テスト用のテーブルを作成
-	err = db.AutoMigrate(&Item{})
+	mysqlUser := os.Getenv("MYSQL_USER")
+	mysqlPassword := os.Getenv("MYSQL_PASSWORD")
+	mysqlPort := os.Getenv("MYSQL_PORT")
+	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
+	dsn := fmt.Sprintf("%s:%s@tcp(db:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		mysqlUser,
+		mysqlPassword,
+		mysqlPort,
+		mysqlDatabase,
+	)
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, err
+		log.Fatalln("Failed to connect to test database:", err)
+		os.Exit(1)
 	}
-
-	// テストデータ投入
+	err = db.AutoMigrate(&model.Item{})
+	if err != nil {
+		os.Exit(1)
+	}
 	err = seedTestData(db)
 	if err != nil {
-		return nil, err
+		os.Exit(1)
 	}
-
-	return db, nil
+	repo = NewItemRepository(db)
+	code := m.Run()
+	os.Exit(code)
 }
 
 func seedTestData(db *gorm.DB) error {
-	items := []Item{
-		{ItemID: 1, ItemName: "Item1", Description: "Description1"},
-		{ItemID: 2, ItemName: "Item2", Description: "Description2"},
+	userId1 := uuid.NewString()
+	userId2 := uuid.NewString()
+	users := []model.User{
+		{UserId: userId1, Name: "User1", Email: "", Password: "password"},
+		{UserId: userId2, Name: "User2", Email: "", Password: "password"},
+	}
+	items := []model.Item{
+		{ItemId: uuid.NewString(), UserId: userId1, ItemName: "Item1", Stock: true, Description: "Description1"},
+		{ItemId: uuid.NewString(), UserId: userId2, ItemName: "Item2", Stock: false, Description: "Description2"},
+	}
+
+	if err := db.Create(&users).Error; err != nil {
+		return err
 	}
 
 	if err := db.Create(&items).Error; err != nil {
@@ -47,20 +77,23 @@ func seedTestData(db *gorm.DB) error {
 
 func TestGetAllItems(t *testing.T) {
 	t.Run("Get All Items - Success", func(t *testing.T) {
-		// Act: メソッドを実行
 		items, err := repo.GetAllItems()
+		assert.NoError(t, err)
+		assert.Len(t, items, 2)
+		assert.IsType(t, domain.Items{}, items)
+		assert.IsType(t, domain.Item{}, items[0])
+		defer func() {
+			db.Exec("DELETE FROM items")
+			db.Exec("DELETE FROM users")
+		}()
+	})
+}
 
-		// Assert: 結果を検証
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
-
-		if len(items) != 2 {
-			t.Errorf("expected 2 items, got %d", len(items))
-		}
-
-		if items[0].Name != "Item1" || items[1].Name != "Item2" {
-			t.Errorf("unexpected items: %+v", items)
-		}
+func TestGetAllItems_Empty(t *testing.T) {
+	t.Run("Get All Items - Empty", func(t *testing.T) {
+		db.Exec("DELETE FROM items")
+		items, err := repo.GetAllItems()
+		assert.NoError(t, err)
+		assert.Len(t, items, 0)
 	})
 }
