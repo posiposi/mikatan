@@ -22,10 +22,10 @@ func (iu *itemUsecase) GetAllItems() ([]dto.ItemResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	itemRes := &[]dto.ItemResponse{}
+	itemsRes := &[]dto.ItemResponse{}
 	for _, v := range items {
 		t := v.ToDto()
-		*itemRes = append(*itemRes, t)
+		*itemsRes = append(*itemsRes, t)
 	}
-	return *itemRes, nil
+	return *itemsRes, nil
 }
