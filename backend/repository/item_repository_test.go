@@ -9,7 +9,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
-	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"github.com/posiposi/project/backend/domain"
 	"github.com/posiposi/project/backend/internal/orm/model"
@@ -54,15 +53,15 @@ func TestMain(m *testing.M) {
 }
 
 func seedTestData(db *gorm.DB) error {
-	userId1 := uuid.NewString()
-	userId2 := uuid.NewString()
+	userId1 := "f47ac10b-58cc-4372-a567-0e02b2c3d111"
+	userId2 := "f47ac10b-58cc-4372-a567-0e02b2c3d112"
 	users := []model.User{
 		{UserId: userId1, Name: "User1", Email: "", Password: "password"},
 		{UserId: userId2, Name: "User2", Email: "", Password: "password"},
 	}
 	items := []model.Item{
-		{ItemId: uuid.NewString(), UserId: userId1, ItemName: "Item1", Stock: true, Description: "Description1"},
-		{ItemId: uuid.NewString(), UserId: userId2, ItemName: "Item2", Stock: false, Description: "Description2"},
+		{ItemId: "f47ac10b-58cc-4372-a567-0e02b2c3d110", UserId: userId1, ItemName: "Item1", Stock: true, Description: "Description1"},
+		{ItemId: "f47ac10b-58cc-4372-a567-0e02b2c3d111", UserId: userId2, ItemName: "Item2", Stock: false, Description: "Description2"},
 	}
 
 	if err := db.Create(&users).Error; err != nil {
