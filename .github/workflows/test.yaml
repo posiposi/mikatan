@@ -44,16 +44,16 @@ jobs:
         run: |
           cp .env.example .env
           cp .env.example ./backend/.env
-          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" | tee .env ./backend/.env
-          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" | tee .env ./backend/.env
-          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" | tee .env ./backend/.env
-          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" | tee .env ./backend/.env
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" | tee .env ./backend/.env
-          echo "MYSQL_TEST_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" | tee .env ./backend/.env
-          echo "MYSQL_TEST_HOST=${{ secrets.MYSQL_TEST_HOST }}" | tee .env ./backend/.env
-          echo "MYSQL_TEST_PORT=${{ secrets.MYSQL_TEST_PORT }}" | tee .env ./backend/.env
-          echo "MYSQL_TEST_DATABASE=${{ secrets.MYSQL_DATABASE }}" | tee .env ./backend/.env
-          echo "DSN=${{ secrets.DSN }}" | tee .env ./backend/.env
+          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" | tee -a .env ./backend/.env
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" | tee -a .env ./backend/.env
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" | tee -a .env ./backend/.env
+          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" | tee -a .env ./backend/.env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" | tee -a .env ./backend/.env
+          echo "MYSQL_TEST_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" | tee -a .env ./backend/.env
+          echo "MYSQL_TEST_HOST=${{ secrets.MYSQL_TEST_HOST }}" | tee -a .env ./backend/.env
+          echo "MYSQL_TEST_PORT=${{ secrets.MYSQL_TEST_PORT }}" | tee -a .env ./backend/.env
+          echo "MYSQL_TEST_DATABASE=${{ secrets.MYSQL_DATABASE }}" | tee -a .env ./backend/.env
+          echo "DSN=${{ secrets.DSN }}" | tee -a .env ./backend/.env
 
       - name: Wait for MySQL
         run: |
@@ -68,8 +68,5 @@ jobs:
 
       - name: Run Test
         run: |
-          # .env
-          cat 
           cd backend
-          cat .env
           go test ./...
