@@ -34,7 +34,7 @@ jobs:
       - name: Go Setup
         uses: actions/setup-go@v5
         with:
-          go-version: ./backend/go.mod
+          go-version-file: ./backend/go.mod
           cache: false
 
       - name: Copy Env File
