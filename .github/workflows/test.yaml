@@ -71,4 +71,5 @@ jobs:
           # .env
           cat 
           cd backend
+          cat .env
           go test ./...
