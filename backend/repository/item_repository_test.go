@@ -24,12 +24,10 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatalln("Error loading .env file")
 	}
-	mysqlUser := os.Getenv("MYSQL_USER")
-	mysqlPassword := os.Getenv("MYSQL_PASSWORD")
-	mysqlPort := os.Getenv("MYSQL_PORT")
-	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
-	dsn := fmt.Sprintf("%s:%s@tcp(db:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		mysqlUser,
+	mysqlPassword := os.Getenv("MYSQL_TEST_ROOT_PASSWORD")
+	mysqlPort := os.Getenv("MYSQL_TEST_PORT")
+	mysqlDatabase := os.Getenv("MYSQL_TEST_DATABASE")
+	dsn := fmt.Sprintf("root:%s@tcp(test_db:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		mysqlPassword,
 		mysqlPort,
 		mysqlDatabase,
