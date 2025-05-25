@@ -18,14 +18,11 @@ func NewDB() *gorm.DB {
 
 	mysqlUser := os.Getenv("MYSQL_USER")
 	mysqlPassword := os.Getenv("MYSQL_PASSWORD")
-	mysqlHost := os.Getenv("MYSQL_HOST")
 	mysqlPort := os.Getenv("MYSQL_PORT")
 	mysqlDatabase := os.Getenv("MYSQL_DATABASE")
-
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	dsn := fmt.Sprintf("%s:%s@tcp(db:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		mysqlUser,
 		mysqlPassword,
-		mysqlHost,
 		mysqlPort,
 		mysqlDatabase,
 	)

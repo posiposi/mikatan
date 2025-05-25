@@ -6,7 +6,7 @@ import (
 	"github.com/posiposi/project/backend/controller"
 )
 
-func NewRouter(uc controller.IUserController, bc controller.IBookController) *echo.Echo {
+func NewRouter(uc controller.IUserController, bc controller.IBookController, ic controller.IItemController) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"https://labstack.com", "https://labstack.net", "http://localhost:3000"},
@@ -26,5 +26,7 @@ func NewRouter(uc controller.IUserController, bc controller.IBookController) *ec
 	b.PUT("/:bookId", bc.UpdateBook)
 	b.DELETE("/:bookId", bc.DeleteBook)
 	b.POST("/recommend", bc.RecommendBooks)
+	i := g.Group("/items")
+	i.GET("", ic.GetAllItems)
 	return e
 }

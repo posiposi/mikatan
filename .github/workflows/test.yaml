@@ -14,7 +14,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    timeout-minutes: 20
+    timeout-minutes: 5
+
+    services:
+      mysql:
+        image: mysql:8.4.5
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
 
     steps:
       - name: Checkout
@@ -23,22 +34,37 @@ jobs:
       - name: Go Setup
         uses: actions/setup-go@v5
         with:
-          go-version: 1.23.4
-          cache: true
+          go-version-file: ./backend/go.mod
+          cache: false
 
       - name: Copy Env File
+        shell: bash
         run: |
           cp .env.example .env
-          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> .env
-          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
-          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
-          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> .env
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "DSN=${{ secrets.DSN }}" >> .env
+          cp .env.example ./backend/.env
+          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" | tee -a .env ./backend/.env
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" | tee -a .env ./backend/.env
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" | tee -a .env ./backend/.env
+          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" | tee -a .env ./backend/.env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" | tee -a .env ./backend/.env
+          echo "MYSQL_TEST_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" | tee -a .env ./backend/.env
+          echo "MYSQL_TEST_HOST=${{ secrets.MYSQL_TEST_HOST }}" | tee -a .env ./backend/.env
+          echo "MYSQL_TEST_PORT=${{ secrets.MYSQL_TEST_PORT }}" | tee -a .env ./backend/.env
+          echo "MYSQL_TEST_DATABASE=${{ secrets.MYSQL_DATABASE }}" | tee -a .env ./backend/.env
+          echo "DSN=${{ secrets.DSN }}" | tee -a .env ./backend/.env
+
+      - name: Wait for MySQL
+        run: |
+          for i in {1..30}; do
+            if echo "${{ secrets.MYSQL_ROOT_PASSWORD }}" | mysqladmin ping -h127.0.0.1 -P3306 -uroot -p --silent; then
+              echo "MySQL is starting!"
+              break
+            fi
+            echo "Waiting for MySQL... ($i)"
+            sleep 2
+          done
 
       - name: Run Test
         run: |
-          # .env
-          cat 
           cd backend
           go test ./...
