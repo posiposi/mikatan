@@ -43,10 +43,6 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		os.Exit(1)
 	}
-	err = seedTestData(db)
-	if err != nil {
-		os.Exit(1)
-	}
 	repo = NewItemRepository(db)
 	code := m.Run()
 	os.Exit(code)
@@ -77,21 +73,24 @@ func seedTestData(db *gorm.DB) error {
 
 func TestGetAllItems(t *testing.T) {
 	t.Run("Get All Items - Success", func(t *testing.T) {
+		tx := db.Begin()
+		defer tx.Rollback()
+		err := seedTestData(tx)
+		assert.NoError(t, err)
+		repo := NewItemRepository(tx)
 		items, err := repo.GetAllItems()
 		assert.NoError(t, err)
 		assert.Len(t, items, 2)
 		assert.IsType(t, domain.Items{}, items)
 		assert.IsType(t, domain.Item{}, items[0])
-		defer func() {
-			db.Exec("DELETE FROM items")
-			db.Exec("DELETE FROM users")
-		}()
 	})
 }
 
 func TestGetAllItems_Empty(t *testing.T) {
 	t.Run("Get All Items - Empty", func(t *testing.T) {
-		db.Exec("DELETE FROM items")
+		tx := db.Begin()
+		defer tx.Rollback()
+		repo := NewItemRepository(tx)
 		items, err := repo.GetAllItems()
 		assert.NoError(t, err)
 		assert.Len(t, items, 0)
