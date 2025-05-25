@@ -55,6 +55,17 @@ jobs:
           echo "MYSQL_TEST_DATABASE=${{ secrets.MYSQL_DATABASE }}" | tee .env ./backend/.env
           echo "DSN=${{ secrets.DSN }}" | tee .env ./backend/.env
 
+      - name: Wait for MySQL
+        run: |
+          for i in {1..30}; do
+            if mysqladmin ping -h127.0.0.1 -P3306 -uroot -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" --silent; then
+              echo "MySQL is starting!"
+              break
+            fi
+            echo "Waiting for MySQL... ($i)"
+            sleep 2
+          done
+
       - name: Run Test
         run: |
           # .env
