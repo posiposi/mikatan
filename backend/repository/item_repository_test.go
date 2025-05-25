@@ -34,6 +34,7 @@ func TestMain(m *testing.M) {
 		mysqlPort,
 		mysqlDatabase,
 	)
+	log.Println("Connecting to test database with DSN:", dsn)
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalln("Failed to connect to test database:", err)
