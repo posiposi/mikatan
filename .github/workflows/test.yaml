@@ -31,12 +31,13 @@ jobs:
       - name: Copy Env File
         run: |
           cp .env.example .env
-          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> .env
-          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
-          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
-          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> .env
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "DSN=${{ secrets.DSN }}" >> .env
+          cp .env.example ./backend/.env
+          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" | tee .env ./backend/.env
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" | tee .env ./backend/.env
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" | tee .env ./backend/.env
+          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" | tee .env ./backend/.env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" | tee .env ./backend/.env
+          echo "DSN=${{ secrets.DSN }}" | tee .env ./backend/.env
 
       - name: Run Test
         run: |
