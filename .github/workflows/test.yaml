@@ -50,7 +50,7 @@ jobs:
           echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" | tee .env ./backend/.env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" | tee .env ./backend/.env
           echo "MYSQL_TEST_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" | tee .env ./backend/.env
-          echo "MYSQL_TEST_HOST=localhost" | tee .env ./backend/.env"
+          echo "MYSQL_TEST_HOST=localhost" | tee .env ./backend/.env
           echo "MYSQL_TEST_PORT=3306" | tee .env ./backend/.env
           echo "MYSQL_TEST_DATABASE=${{ secrets.MYSQL_DATABASE }}" | tee .env ./backend/.env
           echo "DSN=${{ secrets.DSN }}" | tee .env ./backend/.env
