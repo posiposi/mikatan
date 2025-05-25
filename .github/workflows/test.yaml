@@ -58,7 +58,7 @@ jobs:
       - name: Wait for MySQL
         run: |
           for i in {1..30}; do
-            if mysqladmin ping -h127.0.0.1 -P3306 -uroot -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" --silent; then
+            if echo "${{ secrets.MYSQL_ROOT_PASSWORD }}" | mysqladmin ping -h127.0.0.1 -P3306 -uroot -p --silent; then
               echo "MySQL is starting!"
               break
             fi
