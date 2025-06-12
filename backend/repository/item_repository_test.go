@@ -25,12 +25,10 @@ func TestMain(m *testing.M) {
 	}
 	mysqlPassword := os.Getenv("MYSQL_TEST_ROOT_PASSWORD")
 	mysqlHost := os.Getenv("MYSQL_TEST_HOST")
-	mysqlPort := os.Getenv("MYSQL_TEST_PORT")
 	mysqlDatabase := os.Getenv("MYSQL_TEST_DATABASE")
-	dsn := fmt.Sprintf("root:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	dsn := fmt.Sprintf("root:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		mysqlPassword,
 		mysqlHost,
-		mysqlPort,
 		mysqlDatabase,
 	)
 	log.Println("Connecting to test database with DSN:", dsn)

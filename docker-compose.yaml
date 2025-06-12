@@ -25,6 +25,7 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - test_db
     tty: true
     stdin_open: true
     networks:
