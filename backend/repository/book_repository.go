@@ -54,7 +54,7 @@ func (br *bookRepository) CreateBook(book *model.Book) error {
 }
 
 func (br *bookRepository) UpdateBook(book *model.Book, bookId string) error {
-	result := br.db.Model(&book).Where("id = ?", bookId).Updates(map[string]interface{}{
+	result := br.db.Model(&book).Where("id = ?", bookId).Updates(map[string]any{
 		"title":        book.Title,
 		"genre":        book.Genre,
 		"total_page":   book.TotalPage,

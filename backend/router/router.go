@@ -25,7 +25,6 @@ func NewRouter(uc controller.IUserController, bc controller.IBookController, ic 
 	b.POST("", bc.CreateBook)
 	b.PUT("/:bookId", bc.UpdateBook)
 	b.DELETE("/:bookId", bc.DeleteBook)
-	b.POST("/recommend", bc.RecommendBooks)
 	i := g.Group("/items")
 	i.GET("", ic.GetAllItems)
 	return e

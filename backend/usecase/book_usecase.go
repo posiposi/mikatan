@@ -1,12 +1,9 @@
 package usecase
 
 import (
-	"github.com/posiposi/project/backend/infrastructure/openai"
 	"github.com/posiposi/project/backend/model"
 	"github.com/posiposi/project/backend/repository"
 )
-
-const QuestionMessage string = "次に挙げる本を読んだ後に読むおすすめの書籍を1冊教えてください。解説は不要です。書籍名と著者、出版社のみを回答してください。\n"
 
 type IBookUsecase interface {
 	GetAllBooks() ([]model.Book, error)
@@ -14,16 +11,14 @@ type IBookUsecase interface {
 	CreateBook(book model.Book) (model.BookResponse, error)
 	UpdateBook(book model.Book, bookId string) (model.BookResponse, error)
 	DeleteBook(bookId string) error
-	FetchRecommendBooks() (*openai.ChatResponse, error)
 }
 
 type bookUsecase struct {
 	br repository.IBookRepository
-	oc openai.OpenAICommunicator
 }
 
-func NewBookUsecase(br repository.IBookRepository, oc openai.OpenAICommunicator) IBookUsecase {
-	return &bookUsecase{br, oc}
+func NewBookUsecase(br repository.IBookRepository) IBookUsecase {
+	return &bookUsecase{br}
 }
 
 func (bu *bookUsecase) GetAllBooks() ([]model.Book, error) {
@@ -82,29 +77,4 @@ func (bu *bookUsecase) DeleteBook(bookId string) error {
 		return err
 	}
 	return nil
-}
-
-func (bu *bookUsecase) FetchRecommendBooks() (*openai.ChatResponse, error) {
-	books := []model.Book{}
-	repository := bu.br.GetAllBooks(&books)
-	if repository != nil {
-		return nil, repository
-	}
-	titles := ""
-	for _, book := range books {
-		titles += book.Title + "\n"
-	}
-
-	systemPrompt := &openai.Prompt{
-		Role:    openai.System,
-		Content: QuestionMessage + titles,
-	}
-
-	var prompts []*openai.Prompt
-	prompts = append(prompts, systemPrompt)
-	r, err := bu.oc.SendBooks(prompts)
-	if err != nil {
-		return nil, err
-	}
-	return r, nil
 }
