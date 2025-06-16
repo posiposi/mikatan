@@ -1,27 +1,33 @@
-import { Button, Card, Image, Text } from "@chakra-ui/react";
+import { Button, Card, Image, Badge } from "@chakra-ui/react";
+import { Item } from "../../types/item";
 
-const ItemCard = () => {
+interface ItemCardProps {
+  item: Item;
+}
+
+const ItemCard = ({ item }: ItemCardProps) => {
   return (
     <Card.Root maxW="sm" overflow="hidden">
       <Image
         src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-        alt="Green double couch with wooden legs"
+        alt={item.item_name}
       />
       <Card.Body gap="2">
-        <Card.Title>Living room Sofa</Card.Title>
+        <Card.Title>{item.item_name}</Card.Title>
         <Card.Description>
-          This sofa is perfect for modern tropical spaces, baroque inspired
-          spaces.
+          {item.description || "No description available"}
         </Card.Description>
-        <Text textStyle="2xl" fontWeight="medium" letterSpacing="tight" mt="2">
-          $450
-        </Text>
+        <Badge colorScheme={item.stock ? "green" : "red"} mt="2">
+          {item.stock ? "In Stock" : "Out of Stock"}
+        </Badge>
       </Card.Body>
       <Card.Footer gap="2">
-        <Button variant="solid" color={"purple"}>
+        <Button variant="solid" color={"purple"} disabled={!item.stock}>
           Buy now
         </Button>
-        <Button variant="ghost">Add to cart</Button>
+        <Button variant="ghost" disabled={!item.stock}>
+          Add to cart
+        </Button>
       </Card.Footer>
     </Card.Root>
   );

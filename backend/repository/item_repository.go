@@ -19,9 +19,9 @@ func NewItemRepository(db *gorm.DB) IItemRepository {
 }
 
 func (ir *itemRepository) GetAllItems() (domain.Items, error) {
-	// DBから全ての商品を取得
+	// DBから全ての商品を取得（item_idで昇順ソート）
 	var oi []model.Item
-	if err := ir.db.Find(&oi).Error; err != nil {
+	if err := ir.db.Order("item_id ASC").Find(&oi).Error; err != nil {
 		return nil, err
 	}
 	// ループ処理で各商品をドメインモデルに変換してから、itemsに追加する
