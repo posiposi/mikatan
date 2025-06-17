@@ -94,3 +94,38 @@ func TestGetAllItems_Empty(t *testing.T) {
 		assert.Len(t, items, 0)
 	})
 }
+
+func TestGetAllItems_SortedByItemId(t *testing.T) {
+	t.Run("Get All Items - Sorted by ItemId ASC", func(t *testing.T) {
+		tx := db.Begin()
+		defer tx.Rollback()
+		
+		// Create test data with different item IDs
+		userId := "f47ac10b-58cc-4372-a567-0e02b2c3d115"
+		user := model.User{UserId: userId, Name: "TestUser", Email: "test@example.com", Password: "password"}
+		if err := tx.Create(&user).Error; err != nil {
+			t.Fatal(err)
+		}
+		
+		// Create items with IDs in random order
+		items := []model.Item{
+			{ItemId: "c47ac10b-58cc-4372-a567-0e02b2c3d003", UserId: userId, ItemName: "Item3", Stock: true, Description: "Desc3"},
+			{ItemId: "a47ac10b-58cc-4372-a567-0e02b2c3d001", UserId: userId, ItemName: "Item1", Stock: true, Description: "Desc1"},
+			{ItemId: "b47ac10b-58cc-4372-a567-0e02b2c3d002", UserId: userId, ItemName: "Item2", Stock: true, Description: "Desc2"},
+		}
+		
+		if err := tx.Create(&items).Error; err != nil {
+			t.Fatal(err)
+		}
+		
+		repo := NewItemRepository(tx)
+		result, err := repo.GetAllItems()
+		assert.NoError(t, err)
+		assert.Len(t, result, 3)
+		
+		// Check if items are sorted by item_id in ascending order
+		assert.Equal(t, "a47ac10b-58cc-4372-a567-0e02b2c3d001", result[0].ItemId())
+		assert.Equal(t, "b47ac10b-58cc-4372-a567-0e02b2c3d002", result[1].ItemId())
+		assert.Equal(t, "c47ac10b-58cc-4372-a567-0e02b2c3d003", result[2].ItemId())
+	})
+}
