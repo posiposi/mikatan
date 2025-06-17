@@ -78,7 +78,7 @@ const ItemCard = ({ item }: ItemCardProps) => {
             {item.stock && (
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
-                  <Text fontSize="xs" color="gray.500">
+                  <Text fontSize="xs" color="cyan.500">
                     ✓ 即日発送
                   </Text>
                 </Tooltip.Trigger>
