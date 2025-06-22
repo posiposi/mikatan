@@ -17,8 +17,8 @@ func (m *MockBookRepository) GetAllBooks(books *[]model.Book) error {
 	return args.Error(0)
 }
 
-func (m *MockBookRepository) GetBookByBookId(book *model.Book, bookId string) error {
-	args := m.Called(book, bookId)
+func (m *MockBookRepository) GetBookByBookID(book *model.Book, bookID string) error {
+	args := m.Called(book, bookID)
 	return args.Error(0)
 }
 
@@ -27,13 +27,13 @@ func (m *MockBookRepository) CreateBook(book *model.Book) error {
 	return args.Error(0)
 }
 
-func (m *MockBookRepository) UpdateBook(book *model.Book, bookId string) error {
-	args := m.Called(book, bookId)
+func (m *MockBookRepository) UpdateBook(book *model.Book, bookID string) error {
+	args := m.Called(book, bookID)
 	return args.Error(0)
 }
 
-func (m *MockBookRepository) DeleteBook(bookId string) error {
-	args := m.Called(bookId)
+func (m *MockBookRepository) DeleteBook(bookID string) error {
+	args := m.Called(bookID)
 	return args.Error(0)
 }
 

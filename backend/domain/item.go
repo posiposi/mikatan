@@ -8,8 +8,8 @@ import (
 )
 
 type Item struct {
-	itemID      ItemId
-	userId      UserId
+	itemID      ItemID
+	userID      UserID
 	itemName    ItemName
 	stock       Stock
 	description Description
@@ -18,20 +18,20 @@ type Item struct {
 	deletedAt   time.Time
 }
 
-func NewItem(itemId *ItemId, userId UserId, itemName ItemName, stock Stock, description Description) (*Item, error) {
-	var id ItemId
-	if itemId == nil {
-		newId, err := NewItemId(uuid.NewString())
+func NewItem(itemID *ItemID, userID UserID, itemName ItemName, stock Stock, description Description) (*Item, error) {
+	var id ItemID
+	if itemID == nil {
+		newID, err := NewItemID(uuid.NewString())
 		if err != nil {
 			return nil, err
 		}
-		id = *newId
+		id = *newID
 	} else {
-		id = *itemId
+		id = *itemID
 	}
 	item := &Item{
 		itemID:      id,
-		userId:      userId,
+		userID:      userID,
 		itemName:    itemName,
 		stock:       stock,
 		description: description,
@@ -41,12 +41,12 @@ func NewItem(itemId *ItemId, userId UserId, itemName ItemName, stock Stock, desc
 	return item, nil
 }
 
-func (i *Item) ItemId() string {
+func (i *Item) ItemID() string {
 	return i.itemID.Value()
 }
 
-func (i *Item) UserId() string {
-	return i.userId.Value()
+func (i *Item) UserID() string {
+	return i.userID.Value()
 }
 
 func (i *Item) ItemName() string {
@@ -64,7 +64,7 @@ func (i *Item) Description() string {
 func (i *Item) ToDto() dto.ItemResponse {
 	return dto.ItemResponse{
 		ItemId:      i.itemID.Value(),
-		UserId:      i.userId.Value(),
+		UserId:      i.userID.Value(),
 		ItemName:    i.itemName.Value(),
 		Stock:       i.stock.Value(),
 		Description: i.description.Value(),

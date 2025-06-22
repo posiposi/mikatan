@@ -1,3 +1,4 @@
+// Package controller handles HTTP request processing and response formatting.
 package controller
 
 import (
@@ -10,7 +11,7 @@ import (
 
 type IBookController interface {
 	GetAllBooks(c echo.Context) error
-	GetBookByBookId(c echo.Context) error
+	GetBookByBookID(c echo.Context) error
 	CreateBook(c echo.Context) error
 	UpdateBook(c echo.Context) error
 	DeleteBook(c echo.Context) error
@@ -37,9 +38,9 @@ func (bc *bookController) GetAllBooks(c echo.Context) error {
 	return c.JSON(http.StatusOK, booksRes)
 }
 
-func (bc *bookController) GetBookByBookId(c echo.Context) error {
-	bookId := c.Param("bookId")
-	bookRes, err := bc.bu.GetBookByBookId(bookId)
+func (bc *bookController) GetBookByBookID(c echo.Context) error {
+	bookID := c.Param("bookId")
+	bookRes, err := bc.bu.GetBookByBookId(bookID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -60,12 +61,12 @@ func (bc *bookController) CreateBook(c echo.Context) error {
 }
 
 func (bc *bookController) UpdateBook(c echo.Context) error {
-	bookId := c.Param("bookId")
+	bookID := c.Param("bookId")
 	book := model.Book{}
 	if err := c.Bind(&book); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	bookRes, err := bc.bu.UpdateBook(book, bookId)
+	bookRes, err := bc.bu.UpdateBook(book, bookID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -73,8 +74,8 @@ func (bc *bookController) UpdateBook(c echo.Context) error {
 }
 
 func (bc *bookController) DeleteBook(c echo.Context) error {
-	bookId := c.Param("bookId")
-	err := bc.bu.DeleteBook(bookId)
+	bookID := c.Param("bookId")
+	err := bc.bu.DeleteBook(bookID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

@@ -1,3 +1,4 @@
+// Package repository provides data persistence layer implementations.
 package repository
 
 import (
@@ -27,11 +28,11 @@ func (ir *itemRepository) GetAllItems() (domain.Items, error) {
 	// ループ処理で各商品をドメインモデルに変換してから、itemsに追加する
 	var items domain.Items
 	for _, v := range oi {
-		itemId, err := domain.NewItemId(v.ItemId)
+		itemID, err := domain.NewItemID(v.ItemId)
 		if err != nil {
 			return nil, err
 		}
-		userId, err := domain.NewUserId(v.UserId)
+		userID, err := domain.NewUserID(v.UserId)
 		if err != nil {
 			return nil, err
 		}
@@ -48,8 +49,8 @@ func (ir *itemRepository) GetAllItems() (domain.Items, error) {
 			return nil, err
 		}
 		item, err := domain.NewItem(
-			itemId,
-			*userId,
+			itemID,
+			*userID,
 			*itemName,
 			*stock,
 			*description,

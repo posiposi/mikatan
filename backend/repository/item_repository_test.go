@@ -47,15 +47,15 @@ func TestMain(m *testing.M) {
 }
 
 func seedTestData(db *gorm.DB) error {
-	userId1 := "f47ac10b-58cc-4372-a567-0e02b2c3d111"
-	userId2 := "f47ac10b-58cc-4372-a567-0e02b2c3d112"
+	userID1 := "f47ac10b-58cc-4372-a567-0e02b2c3d111"
+	userID2 := "f47ac10b-58cc-4372-a567-0e02b2c3d112"
 	users := []model.User{
-		{UserId: userId1, Name: "User1", Email: "", Password: "password"},
-		{UserId: userId2, Name: "User2", Email: "", Password: "password"},
+		{UserId: userID1, Name: "User1", Email: "", Password: "password"},
+		{UserId: userID2, Name: "User2", Email: "", Password: "password"},
 	}
 	items := []model.Item{
-		{ItemId: "f47ac10b-58cc-4372-a567-0e02b2c3d110", UserId: userId1, ItemName: "Item1", Stock: true, Description: "Description1"},
-		{ItemId: "f47ac10b-58cc-4372-a567-0e02b2c3d111", UserId: userId2, ItemName: "Item2", Stock: false, Description: "Description2"},
+		{ItemId: "f47ac10b-58cc-4372-a567-0e02b2c3d110", UserId: userID1, ItemName: "Item1", Stock: true, Description: "Description1"},
+		{ItemId: "f47ac10b-58cc-4372-a567-0e02b2c3d111", UserId: userID2, ItemName: "Item2", Stock: false, Description: "Description2"},
 	}
 
 	if err := db.Create(&users).Error; err != nil {
@@ -101,17 +101,17 @@ func TestGetAllItems_SortedByItemId(t *testing.T) {
 		defer tx.Rollback()
 		
 		// Create test data with different item IDs
-		userId := "f47ac10b-58cc-4372-a567-0e02b2c3d115"
-		user := model.User{UserId: userId, Name: "TestUser", Email: "test@example.com", Password: "password"}
+		userID := "f47ac10b-58cc-4372-a567-0e02b2c3d115"
+		user := model.User{UserId: userID, Name: "TestUser", Email: "test@example.com", Password: "password"}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
 		
 		// Create items with IDs in random order
 		items := []model.Item{
-			{ItemId: "c47ac10b-58cc-4372-a567-0e02b2c3d003", UserId: userId, ItemName: "Item3", Stock: true, Description: "Desc3"},
-			{ItemId: "a47ac10b-58cc-4372-a567-0e02b2c3d001", UserId: userId, ItemName: "Item1", Stock: true, Description: "Desc1"},
-			{ItemId: "b47ac10b-58cc-4372-a567-0e02b2c3d002", UserId: userId, ItemName: "Item2", Stock: true, Description: "Desc2"},
+			{ItemId: "c47ac10b-58cc-4372-a567-0e02b2c3d003", UserId: userID, ItemName: "Item3", Stock: true, Description: "Desc3"},
+			{ItemId: "a47ac10b-58cc-4372-a567-0e02b2c3d001", UserId: userID, ItemName: "Item1", Stock: true, Description: "Desc1"},
+			{ItemId: "b47ac10b-58cc-4372-a567-0e02b2c3d002", UserId: userID, ItemName: "Item2", Stock: true, Description: "Desc2"},
 		}
 		
 		if err := tx.Create(&items).Error; err != nil {
@@ -124,8 +124,8 @@ func TestGetAllItems_SortedByItemId(t *testing.T) {
 		assert.Len(t, result, 3)
 		
 		// Check if items are sorted by item_id in ascending order
-		assert.Equal(t, "a47ac10b-58cc-4372-a567-0e02b2c3d001", result[0].ItemId())
-		assert.Equal(t, "b47ac10b-58cc-4372-a567-0e02b2c3d002", result[1].ItemId())
-		assert.Equal(t, "c47ac10b-58cc-4372-a567-0e02b2c3d003", result[2].ItemId())
+		assert.Equal(t, "a47ac10b-58cc-4372-a567-0e02b2c3d001", result[0].ItemID())
+		assert.Equal(t, "b47ac10b-58cc-4372-a567-0e02b2c3d002", result[1].ItemID())
+		assert.Equal(t, "c47ac10b-58cc-4372-a567-0e02b2c3d003", result[2].ItemID())
 	})
 }

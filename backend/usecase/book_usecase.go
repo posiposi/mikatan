@@ -49,7 +49,7 @@ func (bu *bookUsecase) GetAllBooks() ([]model.Book, error) {
 
 func (bu *bookUsecase) GetBookByBookId(bookId string) (model.BookResponse, error) {
 	book := model.Book{}
-	if err := bu.br.GetBookByBookId(&book, bookId); err != nil {
+	if err := bu.br.GetBookByBookID(&book, bookId); err != nil {
 		return model.BookResponse{}, err
 	}
 	bookRes := model.BookResponse(book)
