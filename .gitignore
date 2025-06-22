@@ -33,3 +33,6 @@ yarn-error.log*
 
 # claude
 /CLAUDE.md
+
+# gh pr create template body
+/pull-request-body-template.md
