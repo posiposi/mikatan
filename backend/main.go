@@ -19,14 +19,11 @@ func main() {
 	}
 	log.Println("Successfully connected to database")
 	userRepository := repository.NewUserRepository(db)
-	taskRepository := repository.NewBookRepository(db)
 	itemRepository := repository.NewItemRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepository)
-	bookUsecase := usecase.NewBookUsecase(taskRepository)
 	itemUsecase := usecase.NewItemUsecase(itemRepository)
 	userController := controller.NewUserController(userUsecase)
-	bookController := controller.NewBookController(bookUsecase)
 	itemController := controller.NewItemController(itemUsecase)
-	e := router.NewRouter(userController, bookController, itemController)
+	e := router.NewRouter(userController, itemController)
 	e.Logger.Fatal(e.Start(":8080"))
 }
