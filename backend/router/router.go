@@ -1,3 +1,4 @@
+// Package router defines API routes and middleware configuration.
 package router
 
 import (
@@ -20,7 +21,7 @@ func NewRouter(uc controller.IUserController, bc controller.IBookController, ic 
 	u.POST("/logout", uc.LogOut)
 	b := g.Group("/books")
 	b.GET("", bc.GetAllBooks)
-	b.GET("/:bookId", bc.GetBookByBookId)
+	b.GET("/:bookId", bc.GetBookByBookID)
 	// TODO GET以外のメソッドはログインしているユーザーのみアクセス可能
 	b.POST("", bc.CreateBook)
 	b.PUT("/:bookId", bc.UpdateBook)
