@@ -1,3 +1,4 @@
+// Package model defines data models and structures for the application.
 package model
 
 type MessageResponse struct {
