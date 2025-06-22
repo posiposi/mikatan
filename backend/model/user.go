@@ -10,7 +10,6 @@ type User struct {
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
-	Readings  []Reading `gorm:"many2many:readings"`
 }
 
 type UserResponse struct {
