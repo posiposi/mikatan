@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/posiposi/project/backend/controller"
+	authMiddleware "github.com/posiposi/project/backend/middleware"
 )
 
 func NewRouter(uc controller.IUserController, ic controller.IItemController) *echo.Echo {
@@ -21,5 +22,6 @@ func NewRouter(uc controller.IUserController, ic controller.IItemController) *ec
 	u.POST("/logout", uc.LogOut)
 	i := g.Group("/items")
 	i.GET("", ic.GetAllItems)
+	i.POST("", ic.CreateItem, authMiddleware.AuthMiddleware())
 	return e
 }
