@@ -54,7 +54,7 @@ post:
             stock:
               type: boolean
               description: 在庫有無
-              default: ture
+              default: true
             description:
               type: string
               description: 商品説明
