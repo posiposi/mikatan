@@ -1,3 +1,4 @@
+// Package middleware provides HTTP middleware functions for authentication and authorization.
 package middleware
 
 import (
@@ -30,7 +31,7 @@ func AuthMiddleware() echo.MiddlewareFunc {
 				tokenString = parts[1]
 			}
 
-			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 					return nil, jwt.ErrSignatureInvalid
 				}
