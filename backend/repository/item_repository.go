@@ -9,6 +9,7 @@ import (
 
 type IItemRepository interface {
 	GetAllItems() (domain.Items, error)
+	CreateItem(item *domain.Item) (*domain.Item, error)
 }
 
 type itemRepository struct {
@@ -61,4 +62,46 @@ func (ir *itemRepository) GetAllItems() (domain.Items, error) {
 		items = append(items, *item)
 	}
 	return items, nil
+}
+
+func (ir *itemRepository) CreateItem(item *domain.Item) (*domain.Item, error) {
+	ormItem := model.Item{
+		ItemId:      item.ItemID(),
+		UserId:      item.UserID(),
+		ItemName:    item.ItemName(),
+		Stock:       item.Stock(),
+		Description: item.Description(),
+	}
+
+	if err := ir.db.Create(&ormItem).Error; err != nil {
+		return nil, err
+	}
+
+	itemID, err := domain.NewItemID(ormItem.ItemId)
+	if err != nil {
+		return nil, err
+	}
+	userID, err := domain.NewUserID(ormItem.UserId)
+	if err != nil {
+		return nil, err
+	}
+	itemName, err := domain.NewItemName(ormItem.ItemName)
+	if err != nil {
+		return nil, err
+	}
+	stock, err := domain.NewStock(ormItem.Stock)
+	if err != nil {
+		return nil, err
+	}
+	description, err := domain.NewDescription(ormItem.Description)
+	if err != nil {
+		return nil, err
+	}
+
+	createdItem, err := domain.NewItem(itemID, *userID, *itemName, *stock, *description)
+	if err != nil {
+		return nil, err
+	}
+
+	return createdItem, nil
 }

@@ -36,3 +36,6 @@ yarn-error.log*
 
 # gh pr create template body
 /pull-request-body-template.md
+
+# gh issue create template body
+/issue-body-template.md
