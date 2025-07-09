@@ -19,6 +19,17 @@ type MockItemUsecase struct {
 	mock.Mock
 }
 
+type MockValidator struct {
+	shouldFail bool
+}
+
+func (m *MockValidator) Validate(i interface{}) error {
+	if m.shouldFail {
+		return errors.New("validation error")
+	}
+	return nil
+}
+
 func (m *MockItemUsecase) GetAllItems() ([]dto.ItemResponse, error) {
 	args := m.Called()
 	return args.Get(0).([]dto.ItemResponse), args.Error(1)
@@ -34,6 +45,7 @@ func (m *MockItemUsecase) CreateItem(item model.Item, userID string) (*dto.ItemR
 
 func TestCreateItem_Success(t *testing.T) {
 	e := echo.New()
+	e.Validator = &MockValidator{}
 	mockUsecase := new(MockItemUsecase)
 	controller := NewItemController(mockUsecase)
 
@@ -88,8 +100,34 @@ func TestCreateItem_InvalidJSON(t *testing.T) {
 	mockUsecase.AssertNotCalled(t, "CreateItem")
 }
 
+func TestCreateItem_ValidationError(t *testing.T) {
+	e := echo.New()
+	e.Validator = &MockValidator{shouldFail: true}
+	mockUsecase := new(MockItemUsecase)
+	controller := NewItemController(mockUsecase)
+
+	reqBody := model.Item{
+		ItemName:    "",
+		Stock:       true,
+		Description: "Test Description",
+	}
+	jsonBody, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/items", bytes.NewReader(jsonBody))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.Set("user_id", "f47ac10b-58cc-4372-a567-0e02b2c3d400")
+
+	err := controller.CreateItem(c)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+	mockUsecase.AssertNotCalled(t, "CreateItem")
+}
+
 func TestCreateItem_MissingUserID(t *testing.T) {
 	e := echo.New()
+	e.Validator = &MockValidator{}
 	mockUsecase := new(MockItemUsecase)
 	controller := NewItemController(mockUsecase)
 
@@ -113,6 +151,7 @@ func TestCreateItem_MissingUserID(t *testing.T) {
 
 func TestCreateItem_UsecaseError(t *testing.T) {
 	e := echo.New()
+	e.Validator = &MockValidator{}
 	mockUsecase := new(MockItemUsecase)
 	controller := NewItemController(mockUsecase)
 

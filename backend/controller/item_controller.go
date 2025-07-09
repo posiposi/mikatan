@@ -1,3 +1,4 @@
+// Package controller handles HTTP request/response processing and input validation.
 package controller
 
 import (
@@ -32,6 +33,9 @@ func (ic *itemController) GetAllItems(c echo.Context) error {
 func (ic *itemController) CreateItem(c echo.Context) error {
 	item := model.Item{}
 	if err := c.Bind(&item); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	if err := c.Validate(&item); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	userID, ok := c.Get("user_id").(string)
