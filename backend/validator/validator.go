@@ -1,3 +1,4 @@
+// Package validator provides custom validation functionality using go-playground/validator.
 package validator
 
 import (
@@ -8,7 +9,7 @@ type CustomValidator struct {
 	validator *validator.Validate
 }
 
-func (cv *CustomValidator) Validate(i interface{}) error {
+func (cv *CustomValidator) Validate(i any) error {
 	return cv.validator.Struct(i)
 }
 
