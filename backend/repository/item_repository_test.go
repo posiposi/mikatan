@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 		log.Fatalln("Failed to connect to test database:", err)
 		os.Exit(1)
 	}
-	err = db.AutoMigrate(&model.Item{})
+	err = db.AutoMigrate(&model.User{}, &model.Item{})
 	if err != nil {
 		os.Exit(1)
 	}
@@ -50,8 +50,8 @@ func seedTestData(db *gorm.DB) error {
 	userID1 := "f47ac10b-58cc-4372-a567-0e02b2c3d111"
 	userID2 := "f47ac10b-58cc-4372-a567-0e02b2c3d112"
 	users := []model.User{
-		{UserId: userID1, Name: "User1", Email: "", Password: "password"},
-		{UserId: userID2, Name: "User2", Email: "", Password: "password"},
+		{UserId: userID1, Name: "User1", Email: "user1@example.com", Password: "password"},
+		{UserId: userID2, Name: "User2", Email: "user2@example.com", Password: "password"},
 	}
 	items := []model.Item{
 		{ItemId: "f47ac10b-58cc-4372-a567-0e02b2c3d110", UserId: userID1, ItemName: "Item1", Stock: true, Description: "Description1"},
@@ -102,7 +102,7 @@ func TestGetAllItems_SortedByItemId(t *testing.T) {
 
 		// Create test data with different item IDs
 		userID := "f47ac10b-58cc-4372-a567-0e02b2c3d115"
-		user := model.User{UserId: userID, Name: "TestUser", Email: "test@example.com", Password: "password"}
+		user := model.User{UserId: userID, Name: "TestUser", Email: "testuser3@example.com", Password: "password"}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
@@ -136,7 +136,7 @@ func TestCreateItem(t *testing.T) {
 		defer tx.Rollback()
 
 		userID := "f47ac10b-58cc-4372-a567-0e02b2c3d200"
-		user := model.User{UserId: userID, Name: "TestUser", Email: "test@example.com", Password: "password"}
+		user := model.User{UserId: userID, Name: "TestUser", Email: "testuser4@example.com", Password: "password"}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
@@ -177,12 +177,12 @@ func TestCreateItem(t *testing.T) {
 		defer tx.Rollback()
 
 		userID := "f47ac10b-58cc-4372-a567-0e02b2c3d300"
-		user := model.User{UserId: userID, Name: "TestUser", Email: "test@example.com", Password: "password"}
+		user := model.User{UserId: userID, Name: "TestUser", Email: "testuser5@example.com", Password: "password"}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
 
-		itemID := "f47ac10b-58cc-4372-a567-0e02b2c3d301"
+		itemID := "f47ac10b-58cc-4372-a567-0e02b2c3d302"
 		firstItem := model.Item{
 			ItemId:      itemID,
 			UserId:      userID,

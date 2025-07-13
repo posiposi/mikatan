@@ -29,10 +29,21 @@ func (uc *userController) SignUp(c echo.Context) error {
 	if err := c.Bind(&user); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	userRes, err := uc.uu.SignUp(user)
+	userRes, tokenString, err := uc.uu.SignUpWithAutoLogin(user)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
+	cookie := new(http.Cookie)
+	cookie.Name = "token"
+	cookie.Value = tokenString
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.Path = "/"
+	cookie.Domain = os.Getenv("API_DOMAIN")
+	cookie.HttpOnly = true
+	cookie.SameSite = http.SameSiteNoneMode
+	c.SetCookie(cookie)
+
 	return c.JSON(http.StatusCreated, userRes)
 }
 
@@ -59,6 +70,11 @@ func (uc *userController) LogIn(c echo.Context) error {
 }
 
 func (uc *userController) LogOut(c echo.Context) error {
+	userID, ok := c.Get("user_id").(string)
+	if ok && userID != "" {
+		uc.uu.Logout(userID)
+	}
+
 	cookie := new(http.Cookie)
 	cookie.Name = "token"
 	cookie.Value = ""
