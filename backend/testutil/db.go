@@ -31,6 +31,8 @@ func SetupTestDB(t *testing.T) *gorm.DB {
 		t.Fatalf("Failed to migrate test database: %v", err)
 	}
 
+	cleanupTestDB(db)
+
 	t.Cleanup(func() {
 		cleanupTestDB(db)
 	})
@@ -39,6 +41,5 @@ func SetupTestDB(t *testing.T) *gorm.DB {
 }
 
 func cleanupTestDB(db *gorm.DB) {
-	// テストデータをクリーンアップ
 	db.Exec("TRUNCATE TABLE users")
 }

@@ -40,23 +40,19 @@ func (m *MockUserRepository) DeleteUserToken(userID string) error {
 
 func TestUserUsecase_SignUpWithAutoLogin(t *testing.T) {
 	t.Run("should auto login after successful signup", func(t *testing.T) {
-		// Arrange
 		mockRepo := new(MockUserRepository)
 		usecase := NewUserUsecase(mockRepo)
 
 		signupUser := model.User{
-			Email:    "test@example.com",
+			Email:    "signup-auto-login-success@example.com",
 			Password: "password123",
 		}
 
-		// Mock expectations
 		mockRepo.On("CreateUser", mock.AnythingOfType("*model.User")).Return(nil)
 		mockRepo.On("SaveUserToken", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(nil)
 
-		// Act
 		response, token, err := usecase.SignUpWithAutoLogin(signupUser)
 
-		// Assert
 		require.NoError(t, err)
 		assert.NotEmpty(t, response.ID)
 		assert.Equal(t, signupUser.Email, response.Email)
@@ -65,23 +61,19 @@ func TestUserUsecase_SignUpWithAutoLogin(t *testing.T) {
 	})
 
 	t.Run("should return error if token save fails during signup", func(t *testing.T) {
-		// Arrange
 		mockRepo := new(MockUserRepository)
 		usecase := NewUserUsecase(mockRepo)
 
 		signupUser := model.User{
-			Email:    "test@example.com",
+			Email:    "signup-auto-login-error@example.com",
 			Password: "password123",
 		}
 
-		// Mock expectations
 		mockRepo.On("CreateUser", mock.AnythingOfType("*model.User")).Return(nil)
 		mockRepo.On("SaveUserToken", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(assert.AnError)
 
-		// Act
 		_, _, err := usecase.SignUpWithAutoLogin(signupUser)
 
-		// Assert
 		assert.Error(t, err)
 		mockRepo.AssertExpectations(t)
 	})
@@ -89,37 +81,29 @@ func TestUserUsecase_SignUpWithAutoLogin(t *testing.T) {
 
 func TestUserUsecase_Logout(t *testing.T) {
 	t.Run("should delete user token successfully", func(t *testing.T) {
-		// Arrange
 		mockRepo := new(MockUserRepository)
 		usecase := NewUserUsecase(mockRepo)
 
 		userID := uuid.New().String()
 
-		// Mock expectations
 		mockRepo.On("DeleteUserToken", userID).Return(nil)
 
-		// Act
 		err := usecase.Logout(userID)
 
-		// Assert
 		assert.NoError(t, err)
 		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should return error if token deletion fails", func(t *testing.T) {
-		// Arrange
 		mockRepo := new(MockUserRepository)
 		usecase := NewUserUsecase(mockRepo)
 
 		userID := uuid.New().String()
 
-		// Mock expectations
 		mockRepo.On("DeleteUserToken", userID).Return(assert.AnError)
 
-		// Act
 		err := usecase.Logout(userID)
 
-		// Assert
 		assert.Error(t, err)
 		mockRepo.AssertExpectations(t)
 	})
@@ -127,12 +111,11 @@ func TestUserUsecase_Logout(t *testing.T) {
 
 func TestUserUsecase_Login_WithTokenSave(t *testing.T) {
 	t.Run("should save token to database on successful login", func(t *testing.T) {
-		// Arrange
 		mockRepo := new(MockUserRepository)
 		usecase := NewUserUsecase(mockRepo)
 
 		userID := uuid.New().String()
-		email := "test@example.com"
+		email := "login-with-token-save@example.com"
 		password := "password123"
 		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), 10)
 
@@ -147,26 +130,22 @@ func TestUserUsecase_Login_WithTokenSave(t *testing.T) {
 			Password: password,
 		}
 
-		// Mock expectations
 		mockRepo.On("GetUserByEmail", mock.AnythingOfType("*model.User"), email).Return(storedUser, nil)
 		mockRepo.On("SaveUserToken", userID, mock.AnythingOfType("string")).Return(nil)
 
-		// Act
 		token, err := usecase.Login(loginUser)
 
-		// Assert
 		require.NoError(t, err)
 		assert.NotEmpty(t, token)
 		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should return error if token save fails", func(t *testing.T) {
-		// Arrange
 		mockRepo := new(MockUserRepository)
 		usecase := NewUserUsecase(mockRepo)
 
 		userID := uuid.New().String()
-		email := "test@example.com"
+		email := "login-token-save-error@example.com"
 		password := "password123"
 		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), 10)
 
@@ -181,14 +160,11 @@ func TestUserUsecase_Login_WithTokenSave(t *testing.T) {
 			Password: password,
 		}
 
-		// Mock expectations
 		mockRepo.On("GetUserByEmail", mock.AnythingOfType("*model.User"), email).Return(storedUser, nil)
 		mockRepo.On("SaveUserToken", userID, mock.AnythingOfType("string")).Return(assert.AnError)
 
-		// Act
 		_, err := usecase.Login(loginUser)
 
-		// Assert
 		assert.Error(t, err)
 		mockRepo.AssertExpectations(t)
 	})
