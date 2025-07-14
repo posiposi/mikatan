@@ -29,11 +29,11 @@ func (ir *itemRepository) GetAllItems() (domain.Items, error) {
 	// ループ処理で各商品をドメインモデルに変換してから、itemsに追加する
 	var items domain.Items
 	for _, v := range oi {
-		itemID, err := domain.NewItemID(v.ItemId)
+		itemId, err := domain.NewItemId(v.ItemId)
 		if err != nil {
 			return nil, err
 		}
-		userID, err := domain.NewUserID(v.UserId)
+		userId, err := domain.NewUserId(v.UserId)
 		if err != nil {
 			return nil, err
 		}
@@ -50,8 +50,8 @@ func (ir *itemRepository) GetAllItems() (domain.Items, error) {
 			return nil, err
 		}
 		item, err := domain.NewItem(
-			itemID,
-			*userID,
+			itemId,
+			*userId,
 			*itemName,
 			*stock,
 			*description,
@@ -77,11 +77,11 @@ func (ir *itemRepository) CreateItem(item *domain.Item) (*domain.Item, error) {
 		return nil, err
 	}
 
-	itemID, err := domain.NewItemID(ormItem.ItemId)
+	itemId, err := domain.NewItemId(ormItem.ItemId)
 	if err != nil {
 		return nil, err
 	}
-	userID, err := domain.NewUserID(ormItem.UserId)
+	userId, err := domain.NewUserId(ormItem.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (ir *itemRepository) CreateItem(item *domain.Item) (*domain.Item, error) {
 		return nil, err
 	}
 
-	createdItem, err := domain.NewItem(itemID, *userID, *itemName, *stock, *description)
+	createdItem, err := domain.NewItem(itemId, *userId, *itemName, *stock, *description)
 	if err != nil {
 		return nil, err
 	}

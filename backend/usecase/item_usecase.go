@@ -35,7 +35,7 @@ func (iu *itemUsecase) GetAllItems() ([]dto.ItemResponse, error) {
 }
 
 func (iu *itemUsecase) CreateItem(item model.Item, userID string) (*dto.ItemResponse, error) {
-	userIDValue, err := domain.NewUserID(userID)
+	userIdValue, err := domain.NewUserId(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (iu *itemUsecase) CreateItem(item model.Item, userID string) (*dto.ItemResp
 	if err != nil {
 		return nil, err
 	}
-	domainItem, err := domain.NewItem(nil, *userIDValue, *itemName, *stock, *description)
+	domainItem, err := domain.NewItem(nil, *userIdValue, *itemName, *stock, *description)
 	if err != nil {
 		return nil, err
 	}

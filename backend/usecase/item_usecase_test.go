@@ -49,12 +49,12 @@ func TestCreateItem_Success(t *testing.T) {
 		Description: "Test Description",
 	}
 	userID := "f47ac10b-58cc-4372-a567-0e02b2c3d400"
-	itemID, _ := domain.NewItemID("f47ac10b-58cc-4372-a567-0e02b2c3d401")
-	userIDValue, _ := domain.NewUserID(userID)
+	itemId, _ := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d401")
+	userIdValue, _ := domain.NewUserId(userID)
 	itemName, _ := domain.NewItemName(req.ItemName)
 	stock, _ := domain.NewStock(req.Stock)
 	description, _ := domain.NewDescription(req.Description)
-	domainItem, _ := domain.NewItem(itemID, *userIDValue, *itemName, *stock, *description)
+	domainItem, _ := domain.NewItem(itemId, *userIdValue, *itemName, *stock, *description)
 
 	mockRepo.On("CreateItem", mock.AnythingOfType("*domain.Item")).Return(domainItem, nil)
 	result, err := uc.CreateItem(req, userID)

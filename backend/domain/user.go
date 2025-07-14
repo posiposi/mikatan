@@ -6,13 +6,13 @@ import (
 )
 
 type User struct {
-	id       *UserID
+	id       *UserId
 	name     string
 	email    *Email
 	password *Password
 }
 
-func NewUser(id *UserID, name string, email *Email, password *Password) (*User, error) {
+func NewUser(id *UserId, name string, email *Email, password *Password) (*User, error) {
 	if id == nil {
 		return nil, fmt.Errorf("user ID cannot be nil")
 	}
@@ -37,7 +37,7 @@ func NewUser(id *UserID, name string, email *Email, password *Password) (*User, 
 	}, nil
 }
 
-func (u *User) ID() *UserID {
+func (u *User) ID() *UserId {
 	return u.id
 }
 

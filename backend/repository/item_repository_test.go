@@ -50,8 +50,8 @@ func seedTestData(db *gorm.DB) error {
 	userID1 := "f47ac10b-58cc-4372-a567-0e02b2c3d111"
 	userID2 := "f47ac10b-58cc-4372-a567-0e02b2c3d112"
 	users := []model.User{
-		{UserId: userID1, Name: "User1", Email: "", Password: "password"},
-		{UserId: userID2, Name: "User2", Email: "", Password: "password"},
+		{UserId: userID1, Name: "User1", Email: "user1@example.com", Password: "password"},
+		{UserId: userID2, Name: "User2", Email: "user2@example.com", Password: "password"},
 	}
 	items := []model.Item{
 		{ItemId: "f47ac10b-58cc-4372-a567-0e02b2c3d110", UserId: userID1, ItemName: "Item1", Stock: true, Description: "Description1"},
@@ -102,7 +102,7 @@ func TestGetAllItems_SortedByItemId(t *testing.T) {
 
 		// Create test data with different item IDs
 		userID := "f47ac10b-58cc-4372-a567-0e02b2c3d115"
-		user := model.User{UserId: userID, Name: "TestUser", Email: "test@example.com", Password: "password"}
+		user := model.User{UserId: userID, Name: "TestUser", Email: "test1@example.com", Password: "password"}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
@@ -135,15 +135,15 @@ func TestCreateItem(t *testing.T) {
 		tx := db.Begin()
 		defer tx.Rollback()
 
-		userID := "f47ac10b-58cc-4372-a567-0e02b2c3d200"
-		user := model.User{UserId: userID, Name: "TestUser", Email: "test@example.com", Password: "password"}
+		userID := "f47ac10b-58cc-4372-a567-0e02b2c3d250"
+		user := model.User{UserId: userID, Name: "TestUser", Email: "test250@example.com", Password: "password"}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
 
-		itemID, err := domain.NewItemID("f47ac10b-58cc-4372-a567-0e02b2c3d201")
+		itemId, err := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d251")
 		assert.NoError(t, err)
-		userIDValue, err := domain.NewUserID(userID)
+		userIdValue, err := domain.NewUserId(userID)
 		assert.NoError(t, err)
 		itemName, err := domain.NewItemName("Test Item")
 		assert.NoError(t, err)
@@ -151,7 +151,7 @@ func TestCreateItem(t *testing.T) {
 		assert.NoError(t, err)
 		description, err := domain.NewDescription("Test Description")
 		assert.NoError(t, err)
-		item, err := domain.NewItem(itemID, *userIDValue, *itemName, *stock, *description)
+		item, err := domain.NewItem(itemId, *userIdValue, *itemName, *stock, *description)
 		assert.NoError(t, err)
 
 		repo := NewItemRepository(tx)
@@ -177,7 +177,7 @@ func TestCreateItem(t *testing.T) {
 		defer tx.Rollback()
 
 		userID := "f47ac10b-58cc-4372-a567-0e02b2c3d300"
-		user := model.User{UserId: userID, Name: "TestUser", Email: "test@example.com", Password: "password"}
+		user := model.User{UserId: userID, Name: "TestUser", Email: "test3@example.com", Password: "password"}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
@@ -194,9 +194,9 @@ func TestCreateItem(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		itemIDValue, err := domain.NewItemID(itemID)
+		itemIdValue, err := domain.NewItemId(itemID)
 		assert.NoError(t, err)
-		userIDValue, err := domain.NewUserID(userID)
+		userIdValue, err := domain.NewUserId(userID)
 		assert.NoError(t, err)
 		itemName, err := domain.NewItemName("Duplicate Item")
 		assert.NoError(t, err)
@@ -204,7 +204,7 @@ func TestCreateItem(t *testing.T) {
 		assert.NoError(t, err)
 		description, err := domain.NewDescription("Duplicate Description")
 		assert.NoError(t, err)
-		duplicateItem, err := domain.NewItem(itemIDValue, *userIDValue, *itemName, *stock, *description)
+		duplicateItem, err := domain.NewItem(itemIdValue, *userIdValue, *itemName, *stock, *description)
 		assert.NoError(t, err)
 
 		repo := NewItemRepository(tx)

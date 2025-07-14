@@ -7,13 +7,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func createTestItem() (*Item, ItemID, error) {
-	userID, _ := NewUserID(uuid.NewString())
+func createTestItem() (*Item, ItemId, error) {
+	userId, _ := NewUserId(uuid.NewString())
 	itemName, _ := NewItemName("Test Item")
 	stock, _ := NewStock(true)
 	description, _ := NewDescription("This is a test item.")
 
-	item, err := NewItem(nil, *userID, *itemName, *stock, *description)
+	item, err := NewItem(nil, *userId, *itemName, *stock, *description)
 	return item, item.itemID, err
 }
 
