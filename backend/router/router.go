@@ -18,10 +18,9 @@ func NewRouter(uc controller.IUserController, ic controller.IItemController) *ec
 	}))
 
 	g := e.Group("/v1")
-	u := g.Group("/secret-admin")
-	u.POST("/signup", uc.SignUp)
-	u.POST("/login", uc.LogIn)
-	u.POST("/logout", uc.LogOut)
+	g.POST("/signup", uc.SignUp)
+	g.POST("/login", uc.LogIn)
+	g.POST("/logout", uc.LogOut)
 	i := g.Group("/items")
 	i.GET("", ic.GetAllItems)
 	i.POST("", ic.CreateItem, authMiddleware.AuthMiddleware())
