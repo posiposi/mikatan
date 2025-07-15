@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/posiposi/project/backend/model"
+	"github.com/posiposi/project/backend/presenter"
 	"github.com/posiposi/project/backend/usecase"
 )
 
@@ -16,18 +17,20 @@ type IItemController interface {
 
 type itemController struct {
 	iu usecase.IItemUsecase
+	ip presenter.IItemPresenter
 }
 
-func NewItemController(iu usecase.IItemUsecase) IItemController {
-	return &itemController{iu}
+func NewItemController(iu usecase.IItemUsecase, ip presenter.IItemPresenter) IItemController {
+	return &itemController{iu, ip}
 }
 
 func (ic *itemController) GetAllItems(c echo.Context) error {
-	itemsRes, err := ic.iu.GetAllItems()
+	items, err := ic.iu.GetAllItems()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, itemsRes)
+	response := ic.ip.ToJSONList(items)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (ic *itemController) CreateItem(c echo.Context) error {
@@ -42,10 +45,10 @@ func (ic *itemController) CreateItem(c echo.Context) error {
 	if !ok || userID == "" {
 		return c.JSON(http.StatusUnauthorized, "user_id not found in context")
 	}
-	itemRes, err := ic.iu.CreateItem(item, userID)
+	createdItem, err := ic.iu.CreateItem(item, userID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-
-	return c.JSON(http.StatusCreated, itemRes)
+	response := ic.ip.ToJSON(createdItem)
+	return c.JSON(http.StatusCreated, response)
 }
