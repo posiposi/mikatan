@@ -9,8 +9,9 @@ import (
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"github.com/posiposi/project/backend/dto"
+	"github.com/posiposi/project/backend/domain"
 	"github.com/posiposi/project/backend/model"
+	"github.com/posiposi/project/backend/presenter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -30,17 +31,17 @@ func (m *MockValidator) Validate(i interface{}) error {
 	return nil
 }
 
-func (m *MockItemUsecase) GetAllItems() ([]dto.ItemResponse, error) {
+func (m *MockItemUsecase) GetAllItems() ([]*domain.Item, error) {
 	args := m.Called()
-	return args.Get(0).([]dto.ItemResponse), args.Error(1)
+	return args.Get(0).([]*domain.Item), args.Error(1)
 }
 
-func (m *MockItemUsecase) CreateItem(item model.Item, userID string) (*dto.ItemResponse, error) {
+func (m *MockItemUsecase) CreateItem(item model.Item, userID string) (*domain.Item, error) {
 	args := m.Called(item, userID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*dto.ItemResponse), args.Error(1)
+	return args.Get(0).(*domain.Item), args.Error(1)
 }
 
 func TestCreateItem_Success(t *testing.T) {
@@ -56,15 +57,13 @@ func TestCreateItem_Success(t *testing.T) {
 	}
 	jsonBody, _ := json.Marshal(reqBody)
 
-	expectedResponse := &dto.ItemResponse{
-		ItemId:      "f47ac10b-58cc-4372-a567-0e02b2c3d401",
-		UserId:      "f47ac10b-58cc-4372-a567-0e02b2c3d400",
-		ItemName:    "Test Item",
-		Stock:       true,
-		Description: "Test Description",
-	}
+	userID, _ := domain.NewUserID("f47ac10b-58cc-4372-a567-0e02b2c3d400")
+	itemName, _ := domain.NewItemName("Test Item")
+	stock, _ := domain.NewStock(true)
+	description, _ := domain.NewDescription("Test Description")
+	expectedDomainItem, _ := domain.NewItem(nil, *userID, *itemName, *stock, *description)
 
-	mockUsecase.On("CreateItem", reqBody, "f47ac10b-58cc-4372-a567-0e02b2c3d400").Return(expectedResponse, nil)
+	mockUsecase.On("CreateItem", reqBody, "f47ac10b-58cc-4372-a567-0e02b2c3d400").Return(expectedDomainItem, nil)
 	req := httptest.NewRequest(http.MethodPost, "/v1/items", bytes.NewReader(jsonBody))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -75,11 +74,13 @@ func TestCreateItem_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, rec.Code)
 
-	var response dto.ItemResponse
+	var response presenter.ItemResponseJSON
 	err = json.Unmarshal(rec.Body.Bytes(), &response)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedResponse.ItemId, response.ItemId)
-	assert.Equal(t, expectedResponse.ItemName, response.ItemName)
+	assert.Equal(t, expectedDomainItem.ItemID(), response.ItemId)
+	assert.Equal(t, expectedDomainItem.ItemName(), response.ItemName)
+	assert.Equal(t, expectedDomainItem.Stock(), response.Stock)
+	assert.Equal(t, expectedDomainItem.Description(), response.Description)
 	mockUsecase.AssertExpectations(t)
 }
 
