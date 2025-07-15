@@ -20,7 +20,8 @@ type itemController struct {
 	ip presenter.IItemPresenter
 }
 
-func NewItemController(iu usecase.IItemUsecase, ip presenter.IItemPresenter) IItemController {
+func NewItemController(iu usecase.IItemUsecase) IItemController {
+	ip := presenter.NewItemPresenter()
 	return &itemController{iu, ip}
 }
 

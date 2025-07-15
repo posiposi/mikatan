@@ -48,8 +48,7 @@ func TestCreateItem_Success(t *testing.T) {
 	e := echo.New()
 	e.Validator = &MockValidator{}
 	mockUsecase := new(MockItemUsecase)
-	itemPresenter := presenter.NewItemPresenter()
-	controller := NewItemController(mockUsecase, itemPresenter)
+	controller := NewItemController(mockUsecase)
 
 	reqBody := model.Item{
 		ItemName:    "Test Item",
@@ -88,8 +87,7 @@ func TestCreateItem_Success(t *testing.T) {
 func TestCreateItem_InvalidJSON(t *testing.T) {
 	e := echo.New()
 	mockUsecase := new(MockItemUsecase)
-	itemPresenter := presenter.NewItemPresenter()
-	controller := NewItemController(mockUsecase, itemPresenter)
+	controller := NewItemController(mockUsecase)
 
 	req := httptest.NewRequest(http.MethodPost, "/v1/items", bytes.NewReader([]byte("invalid json")))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -107,8 +105,7 @@ func TestCreateItem_ValidationError(t *testing.T) {
 	e := echo.New()
 	e.Validator = &MockValidator{shouldFail: true}
 	mockUsecase := new(MockItemUsecase)
-	itemPresenter := presenter.NewItemPresenter()
-	controller := NewItemController(mockUsecase, itemPresenter)
+	controller := NewItemController(mockUsecase)
 
 	reqBody := model.Item{
 		ItemName:    "",
@@ -133,8 +130,7 @@ func TestCreateItem_MissingUserID(t *testing.T) {
 	e := echo.New()
 	e.Validator = &MockValidator{}
 	mockUsecase := new(MockItemUsecase)
-	itemPresenter := presenter.NewItemPresenter()
-	controller := NewItemController(mockUsecase, itemPresenter)
+	controller := NewItemController(mockUsecase)
 
 	reqBody := model.Item{
 		ItemName:    "Test Item",
@@ -158,8 +154,7 @@ func TestCreateItem_UsecaseError(t *testing.T) {
 	e := echo.New()
 	e.Validator = &MockValidator{}
 	mockUsecase := new(MockItemUsecase)
-	itemPresenter := presenter.NewItemPresenter()
-	controller := NewItemController(mockUsecase, itemPresenter)
+	controller := NewItemController(mockUsecase)
 
 	reqBody := model.Item{
 		ItemName:    "Test Item",
