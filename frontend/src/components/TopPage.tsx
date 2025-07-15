@@ -64,7 +64,10 @@ export default function TopPage() {
   }
 
   return (
-    <Box p={4}>
+    <Box p={4} pt={20}>
+      <Text fontSize="2xl" fontWeight="bold" mb={6} textAlign="center">
+        みかたんにってぃんぐ
+      </Text>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
         {items.map((item) => (
           <ItemCard key={item.item_id} item={item} />

@@ -1,0 +1,24 @@
+import { Box, Button, Flex, Heading, Spacer } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
+
+export default function Navigation() {
+  return (
+    <Box bg="blue.500" px={4} py={2} position="fixed" top={0} left={0} right={0} zIndex={1000}>
+      <Flex alignItems="center">
+        <Heading size="md" color="white">
+          <Link to="/">みかたんにってぃんぐ</Link>
+        </Heading>
+        <Spacer />
+        <Link to="/signup">
+          <Button
+            colorScheme="blue"
+            variant="outline"
+            size="sm"
+          >
+            会員登録
+          </Button>
+        </Link>
+      </Flex>
+    </Box>
+  );
+}
