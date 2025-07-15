@@ -3,14 +3,13 @@ package usecase
 
 import (
 	"github.com/posiposi/project/backend/domain"
-	"github.com/posiposi/project/backend/dto"
 	"github.com/posiposi/project/backend/model"
 	"github.com/posiposi/project/backend/repository"
 )
 
 type IItemUsecase interface {
-	GetAllItems() ([]dto.ItemResponse, error)
-	CreateItem(item model.Item, userID string) (*dto.ItemResponse, error)
+	GetAllItems() ([]*domain.Item, error)
+	CreateItem(item model.Item, userID string) (*domain.Item, error)
 }
 
 type itemUsecase struct {
@@ -21,21 +20,22 @@ func NewItemUsecase(ir repository.IItemRepository) IItemUsecase {
 	return &itemUsecase{ir}
 }
 
-func (iu *itemUsecase) GetAllItems() ([]dto.ItemResponse, error) {
+func (iu *itemUsecase) GetAllItems() ([]*domain.Item, error) {
 	items, err := iu.ir.GetAllItems()
 	if err != nil {
 		return nil, err
 	}
-	itemsRes := &[]dto.ItemResponse{}
-	for _, v := range items {
-		t := v.ToDto()
-		*itemsRes = append(*itemsRes, t)
+	result := make([]*domain.Item, len(items))
+	for i, item := range items {
+		itemCopy := item
+		result[i] = &itemCopy
 	}
-	return *itemsRes, nil
+	return result, nil
 }
 
-func (iu *itemUsecase) CreateItem(item model.Item, userID string) (*dto.ItemResponse, error) {
+func (iu *itemUsecase) CreateItem(item model.Item, userID string) (*domain.Item, error) {
 	userIdValue, err := domain.NewUserId(userID)
+
 	if err != nil {
 		return nil, err
 	}
@@ -59,6 +59,5 @@ func (iu *itemUsecase) CreateItem(item model.Item, userID string) (*dto.ItemResp
 	if err != nil {
 		return nil, err
 	}
-	res := createdItem.ToDto()
-	return &res, nil
+	return createdItem, nil
 }

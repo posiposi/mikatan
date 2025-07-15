@@ -12,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/posiposi/project/backend/domain"
 	"github.com/posiposi/project/backend/internal/orm/model"
+	"github.com/posiposi/project/backend/testutil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -37,8 +38,9 @@ func TestMain(m *testing.M) {
 		log.Fatalln("Failed to connect to test database:", err)
 		os.Exit(1)
 	}
-	err = db.AutoMigrate(&model.Item{})
+	err = testutil.RunPrismaMigrationForTest()
 	if err != nil {
+		log.Fatalln("Failed to run Prisma migration:", err)
 		os.Exit(1)
 	}
 	repo = NewItemRepository(db)

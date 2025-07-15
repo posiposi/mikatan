@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/posiposi/project/backend/domain"
-	"github.com/posiposi/project/backend/dto"
 	"github.com/posiposi/project/backend/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -34,7 +33,7 @@ func TestGetAllItems_ReturnsItems(t *testing.T) {
 	result := domain.Items{}
 	mockRepo.On("GetAllItems").Return(result, nil)
 	items, err := uc.GetAllItems()
-	expected := []dto.ItemResponse{}
+	expected := []*domain.Item{}
 	assert.NoError(t, err)
 	assert.Equal(t, expected, items)
 }
@@ -60,10 +59,10 @@ func TestCreateItem_Success(t *testing.T) {
 	result, err := uc.CreateItem(req, userID)
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
-	assert.Equal(t, domainItem.ItemID(), result.ItemId)
-	assert.Equal(t, domainItem.ItemName(), result.ItemName)
-	assert.Equal(t, domainItem.Stock(), result.Stock)
-	assert.Equal(t, domainItem.Description(), result.Description)
+	assert.Equal(t, domainItem.ItemID(), result.ItemID())
+	assert.Equal(t, domainItem.ItemName(), result.ItemName())
+	assert.Equal(t, domainItem.Stock(), result.Stock())
+	assert.Equal(t, domainItem.Description(), result.Description())
 	mockRepo.AssertExpectations(t)
 }
 
