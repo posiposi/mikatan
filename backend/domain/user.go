@@ -14,7 +14,7 @@ type User struct {
 
 func NewUser(id *UserId, name string, email *Email, password *Password) (*User, error) {
 	if id == nil {
-		return nil, fmt.Errorf("user ID cannot be nil")
+		return nil, fmt.Errorf("user Id cannot be nil")
 	}
 
 	if strings.TrimSpace(name) == "" {
@@ -37,7 +37,7 @@ func NewUser(id *UserId, name string, email *Email, password *Password) (*User, 
 	}, nil
 }
 
-func (u *User) ID() *UserId {
+func (u *User) Id() *UserId {
 	return u.id
 }
 
@@ -61,5 +61,5 @@ func (u *User) Equals(other *User) bool {
 }
 
 func (u *User) String() string {
-	return fmt.Sprintf("User{ID: %s, Name: %s, Email: %s}", u.id.Value(), u.name, u.email.String())
+	return fmt.Sprintf("User{Id: %s, Name: %s, Email: %s}", u.id.Value(), u.name, u.email.String())
 }

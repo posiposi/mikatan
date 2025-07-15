@@ -14,7 +14,7 @@ func createTestItem() (*Item, ItemId, error) {
 	description, _ := NewDescription("This is a test item.")
 
 	item, err := NewItem(nil, *userId, *itemName, *stock, *description)
-	return item, item.itemID, err
+	return item, item.itemId, err
 }
 
 func TestNewItem(t *testing.T) {
@@ -23,21 +23,21 @@ func TestNewItem(t *testing.T) {
 		t.Fatalf("Failed to create test item: %v", err)
 	}
 	assert.NotNil(t, item, "NewItem() should return a non-nil Item")
-	assert.NotNil(t, item.itemID, "ItemId should not be nil")
-	assert.NotNil(t, item.userID, "UserId should not be nil")
+	assert.NotNil(t, item.itemId, "ItemId should not be nil")
+	assert.NotNil(t, item.userId, "UserId should not be nil")
 	assert.NotNil(t, item.itemName, "ItemName should not be nil")
 	assert.NotNil(t, item.stock, "Stock should not be nil")
 	assert.NotNil(t, item.description, "Description should not be nil")
 }
 
 func TestItemId(t *testing.T) {
-	item, itemID, _ := createTestItem()
-	assert.Equal(t, itemID.Value(), item.ItemID())
+	item, itemId, _ := createTestItem()
+	assert.Equal(t, itemId.Value(), item.ItemId())
 }
 
 func TestUserId(t *testing.T) {
 	item, _, _ := createTestItem()
-	assert.Equal(t, item.userID.Value(), item.UserID())
+	assert.Equal(t, item.userId.Value(), item.UserId())
 }
 
 func TestItemName(t *testing.T) {

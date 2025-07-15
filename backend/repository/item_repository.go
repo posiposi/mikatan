@@ -66,8 +66,8 @@ func (ir *itemRepository) GetAllItems() (domain.Items, error) {
 
 func (ir *itemRepository) CreateItem(item *domain.Item) (*domain.Item, error) {
 	ormItem := model.Item{
-		ItemId:      item.ItemID(),
-		UserId:      item.UserID(),
+		ItemId:      item.ItemId(),
+		UserId:      item.UserId(),
 		ItemName:    item.ItemName(),
 		Stock:       item.Stock(),
 		Description: item.Description(),

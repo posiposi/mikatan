@@ -17,8 +17,8 @@ func TestNewUser(t *testing.T) {
 		t.Errorf("NewUser() returned an error: %v", err)
 	}
 
-	if user.ID() != userId {
-		t.Errorf("ID() returned %v, expected %v", user.ID(), userId)
+	if user.Id() != userId {
+		t.Errorf("Id() returned %v, expected %v", user.Id(), userId)
 	}
 	if user.Name() != name {
 		t.Errorf("Name() returned %s, expected %s", user.Name(), name)
@@ -43,14 +43,14 @@ func TestNewUserWithEmptyNameError(t *testing.T) {
 	}
 }
 
-func TestNewUserWithNilIDError(t *testing.T) {
+func TestNewUserWithNilIdError(t *testing.T) {
 	name := "TestUser"
 	email, _ := NewEmail("test@example.com")
 	password, _ := NewPassword("validPassword123")
 
 	_, err := NewUser(nil, name, email, password)
 	if err == nil {
-		t.Errorf("NewUser() should return an error for nil ID")
+		t.Errorf("NewUser() should return an error for nil Id")
 	}
 }
 
@@ -88,11 +88,11 @@ func TestUserEquals(t *testing.T) {
 	user3, _ := NewUser(userId2, "TestUser3", email1, password)
 
 	if !user1.Equals(user2) {
-		t.Errorf("Equals() should return true for users with same ID")
+		t.Errorf("Equals() should return true for users with same Id")
 	}
 
 	if user1.Equals(user3) {
-		t.Errorf("Equals() should return false for users with different IDs")
+		t.Errorf("Equals() should return false for users with different Ids")
 	}
 }
 
@@ -103,7 +103,7 @@ func TestUserString(t *testing.T) {
 	password, _ := NewPassword("validPassword123")
 
 	user, _ := NewUser(userId, name, email, password)
-	expected := "User{ID: " + userId.Value() + ", Name: " + name + ", Email: " + email.String() + "}"
+	expected := "User{Id: " + userId.Value() + ", Name: " + name + ", Email: " + email.String() + "}"
 	if user.String() != expected {
 		t.Errorf("String() returned %s, expected %s", user.String(), expected)
 	}

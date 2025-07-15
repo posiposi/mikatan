@@ -9,7 +9,7 @@ import (
 
 type IItemUsecase interface {
 	GetAllItems() ([]*domain.Item, error)
-	CreateItem(item model.Item, userID string) (*domain.Item, error)
+	CreateItem(item model.Item, userId string) (*domain.Item, error)
 }
 
 type itemUsecase struct {
@@ -33,8 +33,8 @@ func (iu *itemUsecase) GetAllItems() ([]*domain.Item, error) {
 	return result, nil
 }
 
-func (iu *itemUsecase) CreateItem(item model.Item, userID string) (*domain.Item, error) {
-	userIdValue, err := domain.NewUserId(userID)
+func (iu *itemUsecase) CreateItem(item model.Item, userId string) (*domain.Item, error) {
+	userIdValue, err := domain.NewUserId(userId)
 
 	if err != nil {
 		return nil, err

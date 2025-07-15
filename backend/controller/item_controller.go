@@ -42,11 +42,11 @@ func (ic *itemController) CreateItem(c echo.Context) error {
 	if err := c.Validate(&item); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	userID, ok := c.Get("user_id").(string)
-	if !ok || userID == "" {
+	userId, ok := c.Get("user_id").(string)
+	if !ok || userId == "" {
 		return c.JSON(http.StatusUnauthorized, "user_id not found in context")
 	}
-	createdItem, err := ic.iu.CreateItem(item, userID)
+	createdItem, err := ic.iu.CreateItem(item, userId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

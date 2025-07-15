@@ -7,8 +7,8 @@ import (
 )
 
 type Item struct {
-	itemID      ItemId
-	userID      UserId
+	itemId      ItemId
+	userId      UserId
 	itemName    ItemName
 	stock       Stock
 	description Description
@@ -17,20 +17,20 @@ type Item struct {
 	deletedAt   time.Time
 }
 
-func NewItem(itemID *ItemId, userID UserId, itemName ItemName, stock Stock, description Description) (*Item, error) {
+func NewItem(itemId *ItemId, userId UserId, itemName ItemName, stock Stock, description Description) (*Item, error) {
 	var id ItemId
-	if itemID == nil {
-		newID, err := NewItemId(uuid.NewString())
+	if itemId == nil {
+		newId, err := NewItemId(uuid.NewString())
 		if err != nil {
 			return nil, err
 		}
-		id = *newID
+		id = *newId
 	} else {
-		id = *itemID
+		id = *itemId
 	}
 	item := &Item{
-		itemID:      id,
-		userID:      userID,
+		itemId:      id,
+		userId:      userId,
 		itemName:    itemName,
 		stock:       stock,
 		description: description,
@@ -40,12 +40,12 @@ func NewItem(itemID *ItemId, userID UserId, itemName ItemName, stock Stock, desc
 	return item, nil
 }
 
-func (i *Item) ItemID() string {
-	return i.itemID.Value()
+func (i *Item) ItemId() string {
+	return i.itemId.Value()
 }
 
-func (i *Item) UserID() string {
-	return i.userID.Value()
+func (i *Item) UserId() string {
+	return i.userId.Value()
 }
 
 func (i *Item) ItemName() string {
