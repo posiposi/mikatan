@@ -26,8 +26,9 @@ func (iu *itemUsecase) GetAllItems() ([]*domain.Item, error) {
 		return nil, err
 	}
 	result := make([]*domain.Item, len(items))
-	for i := range items {
-		result[i] = &items[i]
+	for i, item := range items {
+		itemCopy := item
+		result[i] = &itemCopy
 	}
 	return result, nil
 }
