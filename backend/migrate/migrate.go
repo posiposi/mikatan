@@ -2,14 +2,19 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/posiposi/project/backend/db"
-	"github.com/posiposi/project/backend/model"
+	"os/exec"
+	"log"
 )
 
 func main() {
-	dbConn := db.NewDB()
 	defer fmt.Println("Successfully Migrated")
-	defer db.CloseDB(dbConn)
-	dbConn.AutoMigrate(&model.User{})
+	
+	cmd := exec.Command("go", "run", "github.com/steebchen/prisma-client-go", "migrate", "deploy", "--schema", "./infrastructure/prisma/schema.prisma")
+	
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Fatalf("Failed to run prisma migration: %v, output: %s", err, string(output))
+	}
+	
+	fmt.Println("Prisma migration completed successfully")
 }
