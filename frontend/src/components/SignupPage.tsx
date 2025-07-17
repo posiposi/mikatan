@@ -73,6 +73,7 @@ export default function SignupPage() {
               <Input
                 {...register("name", { required: "名前は必須です" })}
                 placeholder="名前を入力してください"
+                autoComplete="name"
               />
             </Field>
 
@@ -91,6 +92,7 @@ export default function SignupPage() {
                   },
                 })}
                 placeholder="email@example.com"
+                autoComplete="email"
               />
             </Field>
 
@@ -109,6 +111,7 @@ export default function SignupPage() {
                   },
                 })}
                 placeholder="パスワードを入力してください"
+                autoComplete="new-password"
               />
             </Field>
 
