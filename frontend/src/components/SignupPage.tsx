@@ -52,8 +52,14 @@ export default function SignupPage() {
   };
 
   return (
-    <Container maxW="md" py={8} pt={20}>
-      <Box p={6} borderRadius="md" boxShadow="md">
+    <Container py={8} pt={20}>
+      <Box
+        className="register_form"
+        p={8}
+        borderRadius="lg"
+        boxShadow="lg"
+        width="800px"
+      >
         <Heading mb={6} textAlign="center">
           会員登録
         </Heading>

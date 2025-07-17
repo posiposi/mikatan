@@ -65,7 +65,16 @@ export default function TopPage() {
 
   return (
     <Box p={4} pt={20}>
-      <Text fontSize="2xl" fontWeight="bold" mb={6} textAlign="center">
+      <Text
+        fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}
+        fontWeight="extrabold"
+        mb={8}
+        textAlign="center"
+        color="blue.600"
+        letterSpacing="tight"
+        lineHeight="shorter"
+        textShadow="2px 2px 4px rgba(0,0,0,0.1)"
+      >
         みかたんにってぃんぐ
       </Text>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
