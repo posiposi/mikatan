@@ -1,18 +1,38 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import TopPage from "./components/TopPage";
 import SignupPage from "./components/SignupPage";
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: (
+      <>
+        <Navigation />
+        <TopPage />
+      </>
+    ),
+  },
+  {
+    path: "/signup",
+    element: (
+      <>
+        <Navigation />
+        <SignupPage />
+      </>
+    ),
+  },
+]);
+
 function App() {
   return (
-    <BrowserRouter>
-      <Navigation />
-      <Routes>
-        <Route path="/" element={<TopPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-      </Routes>
-    </BrowserRouter>
+    <RouterProvider
+      router={router}
+      future={{
+        v7_startTransition: true,
+      }}
+    />
   );
 }
 
