@@ -11,6 +11,7 @@ import { Field } from "@/components/ui/field";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { post } from "../utils/api";
 
 interface SignupFormData {
   name: string;
@@ -31,26 +32,12 @@ export default function SignupPage() {
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
     try {
-      const signupResponse = await fetch("/v1/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-        credentials: 'include',
-      });
+      const signupResponse = await post("/v1/signup", data);
 
       if (signupResponse.ok) {
-        const loginResponse = await fetch("/v1/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: data.email,
-            password: data.password,
-          }),
-          credentials: 'include',
+        const loginResponse = await post("/v1/login", {
+          email: data.email,
+          password: data.password,
         });
 
         if (loginResponse.ok) {

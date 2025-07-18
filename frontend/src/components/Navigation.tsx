@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import LogoutConfirmDialog from "./LogoutConfirmDialog";
+import { post } from "../utils/api";
 
 export default function Navigation() {
   const { isAuthenticated, logout } = useAuth();
@@ -10,10 +11,7 @@ export default function Navigation() {
 
   const handleLogout = async () => {
     try {
-      await fetch("/v1/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+      await post("/v1/logout");
       logout();
     } catch {
       logout();

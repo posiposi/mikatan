@@ -11,6 +11,7 @@ import { Field } from "@/components/ui/field";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { post } from "../utils/api";
 
 interface LoginFormData {
   email: string;
@@ -30,17 +31,11 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const response = await fetch("/v1/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-        credentials: 'include',
-      });
+      const response = await post("/v1/login", data);
 
       if (response.ok) {
-        login();
+        const result = await response.json();
+        login(result.token);
         alert("ログインしました。");
         navigate("/");
       } else {
@@ -48,7 +43,7 @@ export default function LoginPage() {
         alert(`ログインに失敗しました: ${error}`);
       }
     } catch {
-      alert("ネットワークエラーが発生しました。");
+      alert("ネットワークエラーが発生しました");
     } finally {
       setIsLoading(false);
     }

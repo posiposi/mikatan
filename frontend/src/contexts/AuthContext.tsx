@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect } from 'react';
+import { get } from '../utils/api';
 
 export interface AuthContextType {
   isAuthenticated: boolean;
@@ -17,9 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkAuthStatus = async () => {
     try {
-      const response = await fetch('/v1/auth/check', {
-        credentials: 'include',
-      });
+      const response = await get('/v1/auth/check', true);
       
       if (response.ok) {
         setIsAuthenticated(true);
