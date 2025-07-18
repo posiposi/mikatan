@@ -29,7 +29,7 @@ export default function SignupPage() {
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
     try {
-      const response = await fetch("/v1/signup", {
+      const signupResponse = await fetch("/v1/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,11 +37,27 @@ export default function SignupPage() {
         body: JSON.stringify(data),
       });
 
-      if (response.ok) {
-        alert("会員登録が完了しました。");
-        navigate("/");
+      if (signupResponse.ok) {
+        const loginResponse = await fetch("/v1/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+        });
+
+        if (loginResponse.ok) {
+          alert("会員登録が完了しました。自動的にログインしています。");
+          navigate("/");
+        } else {
+          alert("会員登録は完了しましたが、ログインに失敗しました。手動でログインしてください。");
+          navigate("/login");
+        }
       } else {
-        const error = await response.text();
+        const error = await signupResponse.text();
         alert(`登録に失敗しました: ${error}`);
       }
     } catch {
