@@ -21,6 +21,7 @@ func NewRouter(uc controller.IUserController, ic controller.IItemController) *ec
 	g.POST("/signup", uc.SignUp)
 	g.POST("/login", uc.LogIn)
 	g.POST("/logout", uc.LogOut)
+	g.GET("/auth/check", uc.CheckAuth, authMiddleware.AuthMiddleware())
 	i := g.Group("/items")
 	i.GET("", ic.GetAllItems)
 	i.POST("", ic.CreateItem, authMiddleware.AuthMiddleware())

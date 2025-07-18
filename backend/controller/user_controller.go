@@ -14,6 +14,7 @@ type IUserController interface {
 	SignUp(c echo.Context) error
 	LogIn(c echo.Context) error
 	LogOut(c echo.Context) error
+	CheckAuth(c echo.Context) error
 }
 
 type userController struct {
@@ -69,4 +70,8 @@ func (uc *userController) LogOut(c echo.Context) error {
 	cookie.SameSite = http.SameSiteNoneMode
 	c.SetCookie(cookie)
 	return c.NoContent(http.StatusOK)
+}
+
+func (uc *userController) CheckAuth(c echo.Context) error {
+	return c.JSON(http.StatusOK, map[string]bool{"authenticated": true})
 }
