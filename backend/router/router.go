@@ -13,14 +13,16 @@ func NewRouter(uc controller.IUserController, ic controller.IItemController) *ec
 	e := echo.New()
 	e.Validator = validator.NewValidator()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"https://labstack.com", "https://labstack.net", "http://localhost:3000"},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowOrigins:     []string{"https://labstack.com", "https://labstack.net", "http://localhost:3000"},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
+		AllowCredentials: true,
 	}))
 
 	g := e.Group("/v1")
 	g.POST("/signup", uc.SignUp)
 	g.POST("/login", uc.LogIn)
 	g.POST("/logout", uc.LogOut)
+	g.GET("/auth/check", uc.CheckAuth, authMiddleware.AuthMiddleware())
 	i := g.Group("/items")
 	i.GET("", ic.GetAllItems)
 	i.POST("", ic.CreateItem, authMiddleware.AuthMiddleware())

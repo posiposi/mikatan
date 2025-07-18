@@ -1,10 +1,9 @@
 import { Item } from "../../types/item";
-
-const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+import { get } from "./api";
 
 export const getItems = async (): Promise<Item[]> => {
   try {
-    const response = await fetch(`${baseURL}/v1/items`);
+    const response = await get("/v1/items", true);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

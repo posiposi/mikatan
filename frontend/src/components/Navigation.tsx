@@ -1,7 +1,28 @@
 import { Box, Button, Flex, Heading, Spacer } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useAuth } from "../hooks/useAuth";
+import LogoutConfirmDialog from "./LogoutConfirmDialog";
+import { post } from "../utils/api";
 
 export default function Navigation() {
+  const { isAuthenticated, logout } = useAuth();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await post("/v1/logout");
+      logout();
+    } catch {
+      logout();
+    }
+  };
+
+  const handleConfirmLogout = () => {
+    setIsDialogOpen(false);
+    handleLogout();
+  };
+
   return (
     <Box
       bg="blue.500"
@@ -27,12 +48,38 @@ export default function Navigation() {
           </Link>
         </Heading>
         <Spacer />
-        <Link to="/signup">
-          <Button colorScheme="blue" variant="outline" size="sm">
-            会員登録
-          </Button>
-        </Link>
+        <Flex gap={2}>
+          {!isAuthenticated && (
+            <>
+              <Link to="/login">
+                <Button colorScheme="blue" variant="outline" size="sm">
+                  ログイン
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button colorScheme="blue" variant="outline" size="sm">
+                  会員登録
+                </Button>
+              </Link>
+            </>
+          )}
+          {isAuthenticated && (
+            <Button
+              colorScheme="blue"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsDialogOpen(true)}
+            >
+              ログアウト
+            </Button>
+          )}
+        </Flex>
       </Flex>
+      <LogoutConfirmDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onConfirm={handleConfirmLogout}
+      />
     </Box>
   );
 }

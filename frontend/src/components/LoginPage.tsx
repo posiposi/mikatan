@@ -13,48 +13,37 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { post } from "../utils/api";
 
-interface SignupFormData {
-  name: string;
+interface LoginFormData {
   email: string;
   password: string;
 }
 
-export default function SignupPage() {
+export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignupFormData>();
+  } = useForm<LoginFormData>();
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const onSubmit = async (data: SignupFormData) => {
+  const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const signupResponse = await post("/v1/signup", data);
+      const response = await post("/v1/login", data);
 
-      if (signupResponse.ok) {
-        const loginResponse = await post("/v1/login", {
-          email: data.email,
-          password: data.password,
-        });
-
-        if (loginResponse.ok) {
-          const result = await loginResponse.json();
-          login(result.token);
-          alert("会員登録が完了しました。自動的にログインしています。");
-          navigate("/");
-        } else {
-          alert("会員登録は完了しましたが、ログインに失敗しました。手動でログインしてください。");
-          navigate("/login");
-        }
+      if (response.ok) {
+        const result = await response.json();
+        login(result.token);
+        alert("ログインしました。");
+        navigate("/");
       } else {
-        const error = await signupResponse.text();
-        alert(`登録に失敗しました: ${error}`);
+        const error = await response.text();
+        alert(`ログインに失敗しました: ${error}`);
       }
     } catch {
-      alert("ネットワークエラーが発生しました。");
+      alert("ネットワークエラーが発生しました");
     } finally {
       setIsLoading(false);
     }
@@ -63,29 +52,17 @@ export default function SignupPage() {
   return (
     <Container py={8} pt={20}>
       <Box
-        className="register_form"
+        className="login_form"
         p={8}
         borderRadius="lg"
         boxShadow="lg"
         width="800px"
       >
         <Heading mb={6} textAlign="center">
-          会員登録
+          ログイン
         </Heading>
         <form onSubmit={handleSubmit(onSubmit)}>
           <VStack gap={4}>
-            <Field
-              label="名前"
-              invalid={!!errors.name}
-              errorText={errors.name?.message}
-            >
-              <Input
-                {...register("name", { required: "名前は必須です" })}
-                placeholder="名前を入力してください"
-                autoComplete="name"
-              />
-            </Field>
-
             <Field
               label="メールアドレス"
               invalid={!!errors.email}
@@ -120,7 +97,7 @@ export default function SignupPage() {
                   },
                 })}
                 placeholder="パスワードを入力してください"
-                autoComplete="new-password"
+                autoComplete="current-password"
               />
             </Field>
 
@@ -129,9 +106,9 @@ export default function SignupPage() {
               colorScheme="blue"
               width="full"
               loading={isLoading}
-              loadingText="登録中..."
+              loadingText="ログイン中..."
             >
-              会員登録
+              ログイン
             </Button>
           </VStack>
         </form>
