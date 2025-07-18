@@ -10,23 +10,23 @@ import (
 )
 
 func createTestDomainItem() *domain.Item {
-	userID, _ := domain.NewUserID(uuid.NewString())
+	userId, _ := domain.NewUserId(uuid.NewString())
 	itemName, _ := domain.NewItemName("Test Item")
 	stock, _ := domain.NewStock(true)
 	description, _ := domain.NewDescription("Test Description")
-	
-	item, _ := domain.NewItem(nil, *userID, *itemName, *stock, *description)
+
+	item, _ := domain.NewItem(nil, *userId, *itemName, *stock, *description)
 	return item
 }
 
 func TestItemPresenter_ToJSON(t *testing.T) {
 	presenter := NewItemPresenter()
 	domainItem := createTestDomainItem()
-	
+
 	result := presenter.ToJSON(domainItem)
-	
-	assert.Equal(t, domainItem.ItemID(), result.ItemId)
-	assert.Equal(t, domainItem.UserID(), result.UserId)
+
+	assert.Equal(t, domainItem.ItemId(), result.ItemId)
+	assert.Equal(t, domainItem.UserId(), result.UserId)
 	assert.Equal(t, domainItem.ItemName(), result.ItemName)
 	assert.Equal(t, domainItem.Stock(), result.Stock)
 	assert.Equal(t, domainItem.Description(), result.Description)
@@ -40,14 +40,14 @@ func TestItemPresenter_ToJSONList(t *testing.T) {
 		createTestDomainItem(),
 		createTestDomainItem(),
 	}
-	
+
 	result := presenter.ToJSONList(domainItems)
-	
+
 	assert.Len(t, result, 2)
-	
+
 	for i, jsonItem := range result {
-		assert.Equal(t, domainItems[i].ItemID(), jsonItem.ItemId)
-		assert.Equal(t, domainItems[i].UserID(), jsonItem.UserId)
+		assert.Equal(t, domainItems[i].ItemId(), jsonItem.ItemId)
+		assert.Equal(t, domainItems[i].UserId(), jsonItem.UserId)
 		assert.Equal(t, domainItems[i].ItemName(), jsonItem.ItemName)
 		assert.Equal(t, domainItems[i].Stock(), jsonItem.Stock)
 		assert.Equal(t, domainItems[i].Description(), jsonItem.Description)
@@ -57,9 +57,9 @@ func TestItemPresenter_ToJSONList(t *testing.T) {
 func TestItemPresenter_ToJSONList_EmptySlice(t *testing.T) {
 	presenter := NewItemPresenter()
 	emptyItems := []*domain.Item{}
-	
+
 	result := presenter.ToJSONList(emptyItems)
-	
+
 	assert.Empty(t, result)
 	assert.NotNil(t, result)
 }

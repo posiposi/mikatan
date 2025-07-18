@@ -6,19 +6,19 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserID struct {
+type UserId struct {
 	value string
 }
 
-func NewUserID(value string) (*UserID, error) {
+func NewUserId(value string) (*UserId, error) {
 	if uuid.Validate(value) != nil {
 		return nil, fmt.Errorf("invalid UUID: %s", value)
 	}
-	userID := new(UserID)
-	userID.value = value
-	return userID, nil
+	userId := new(UserId)
+	userId.value = value
+	return userId, nil
 }
 
-func (userID *UserID) Value() string {
-	return userID.value
+func (userId *UserId) Value() string {
+	return userId.value
 }

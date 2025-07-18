@@ -36,8 +36,8 @@ func (m *MockItemUsecase) GetAllItems() ([]*domain.Item, error) {
 	return args.Get(0).([]*domain.Item), args.Error(1)
 }
 
-func (m *MockItemUsecase) CreateItem(item model.Item, userID string) (*domain.Item, error) {
-	args := m.Called(item, userID)
+func (m *MockItemUsecase) CreateItem(item model.Item, userId string) (*domain.Item, error) {
+	args := m.Called(item, userId)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
@@ -57,11 +57,11 @@ func TestCreateItem_Success(t *testing.T) {
 	}
 	jsonBody, _ := json.Marshal(reqBody)
 
-	userID, _ := domain.NewUserID("f47ac10b-58cc-4372-a567-0e02b2c3d400")
+	userId, _ := domain.NewUserId("f47ac10b-58cc-4372-a567-0e02b2c3d400")
 	itemName, _ := domain.NewItemName("Test Item")
 	stock, _ := domain.NewStock(true)
 	description, _ := domain.NewDescription("Test Description")
-	expectedDomainItem, _ := domain.NewItem(nil, *userID, *itemName, *stock, *description)
+	expectedDomainItem, _ := domain.NewItem(nil, *userId, *itemName, *stock, *description)
 
 	mockUsecase.On("CreateItem", reqBody, "f47ac10b-58cc-4372-a567-0e02b2c3d400").Return(expectedDomainItem, nil)
 	req := httptest.NewRequest(http.MethodPost, "/v1/items", bytes.NewReader(jsonBody))
@@ -77,7 +77,7 @@ func TestCreateItem_Success(t *testing.T) {
 	var response presenter.ItemResponseJSON
 	err = json.Unmarshal(rec.Body.Bytes(), &response)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedDomainItem.ItemID(), response.ItemId)
+	assert.Equal(t, expectedDomainItem.ItemId(), response.ItemId)
 	assert.Equal(t, expectedDomainItem.ItemName(), response.ItemName)
 	assert.Equal(t, expectedDomainItem.Stock(), response.Stock)
 	assert.Equal(t, expectedDomainItem.Description(), response.Description)
@@ -126,7 +126,7 @@ func TestCreateItem_ValidationError(t *testing.T) {
 	mockUsecase.AssertNotCalled(t, "CreateItem")
 }
 
-func TestCreateItem_MissingUserID(t *testing.T) {
+func TestCreateItem_MissingUserId(t *testing.T) {
 	e := echo.New()
 	e.Validator = &MockValidator{}
 	mockUsecase := new(MockItemUsecase)

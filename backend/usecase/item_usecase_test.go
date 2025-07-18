@@ -47,19 +47,19 @@ func TestCreateItem_Success(t *testing.T) {
 		Stock:       true,
 		Description: "Test Description",
 	}
-	userID := "f47ac10b-58cc-4372-a567-0e02b2c3d400"
-	itemID, _ := domain.NewItemID("f47ac10b-58cc-4372-a567-0e02b2c3d401")
-	userIDValue, _ := domain.NewUserID(userID)
+	userId := "f47ac10b-58cc-4372-a567-0e02b2c3d400"
+	itemId, _ := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d401")
+	userIdValue, _ := domain.NewUserId(userId)
 	itemName, _ := domain.NewItemName(req.ItemName)
 	stock, _ := domain.NewStock(req.Stock)
 	description, _ := domain.NewDescription(req.Description)
-	domainItem, _ := domain.NewItem(itemID, *userIDValue, *itemName, *stock, *description)
+	domainItem, _ := domain.NewItem(itemId, *userIdValue, *itemName, *stock, *description)
 
 	mockRepo.On("CreateItem", mock.AnythingOfType("*domain.Item")).Return(domainItem, nil)
-	result, err := uc.CreateItem(req, userID)
+	result, err := uc.CreateItem(req, userId)
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
-	assert.Equal(t, domainItem.ItemID(), result.ItemID())
+	assert.Equal(t, domainItem.ItemId(), result.ItemId())
 	assert.Equal(t, domainItem.ItemName(), result.ItemName())
 	assert.Equal(t, domainItem.Stock(), result.Stock())
 	assert.Equal(t, domainItem.Description(), result.Description())
@@ -75,8 +75,8 @@ func TestCreateItem_InvalidItemName(t *testing.T) {
 		Stock:       true,
 		Description: "Test Description",
 	}
-	userID := "f47ac10b-58cc-4372-a567-0e02b2c3d400"
-	result, err := uc.CreateItem(req, userID)
+	userId := "f47ac10b-58cc-4372-a567-0e02b2c3d400"
+	result, err := uc.CreateItem(req, userId)
 
 	assert.Error(t, err)
 	assert.Nil(t, result)
@@ -84,7 +84,7 @@ func TestCreateItem_InvalidItemName(t *testing.T) {
 	mockRepo.AssertNotCalled(t, "CreateItem")
 }
 
-func TestCreateItem_InvalidUserID(t *testing.T) {
+func TestCreateItem_InvalidUserId(t *testing.T) {
 	mockRepo := new(MockItemRepository)
 	uc := NewItemUsecase(mockRepo)
 
@@ -93,8 +93,8 @@ func TestCreateItem_InvalidUserID(t *testing.T) {
 		Stock:       true,
 		Description: "Test Description",
 	}
-	invalidUserID := "invalid-uuid"
-	result, err := uc.CreateItem(req, invalidUserID)
+	invalidUserId := "invalid-uuid"
+	result, err := uc.CreateItem(req, invalidUserId)
 
 	assert.Error(t, err)
 	assert.Nil(t, result)
@@ -111,9 +111,9 @@ func TestCreateItem_RepositoryError(t *testing.T) {
 		Stock:       true,
 		Description: "Test Description",
 	}
-	userID := "f47ac10b-58cc-4372-a567-0e02b2c3d400"
+	userId := "f47ac10b-58cc-4372-a567-0e02b2c3d400"
 	mockRepo.On("CreateItem", mock.AnythingOfType("*domain.Item")).Return(nil, errors.New("database error"))
-	result, err := uc.CreateItem(req, userID)
+	result, err := uc.CreateItem(req, userId)
 
 	assert.Error(t, err)
 	assert.Nil(t, result)

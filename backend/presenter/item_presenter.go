@@ -29,8 +29,8 @@ func NewItemPresenter() IItemPresenter {
 
 func (p *itemPresenter) ToJSON(item *domain.Item) ItemResponseJSON {
 	return ItemResponseJSON{
-		ItemId:      item.ItemID(),
-		UserId:      item.UserID(),
+		ItemId:      item.ItemId(),
+		UserId:      item.UserId(),
 		ItemName:    item.ItemName(),
 		Stock:       item.Stock(),
 		Description: item.Description(),

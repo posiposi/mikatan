@@ -43,8 +43,8 @@ func AuthMiddleware() echo.MiddlewareFunc {
 			}
 
 			if claims, ok := token.Claims.(jwt.MapClaims); ok {
-				if userID, exists := claims["user_id"].(string); exists {
-					c.Set("user_id", userID)
+				if userId, exists := claims["user_id"].(string); exists {
+					c.Set("user_id", userId)
 					return next(c)
 				}
 			}
