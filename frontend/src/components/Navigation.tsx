@@ -1,9 +1,12 @@
 import { Box, Button, Flex, Heading, Spacer } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import LogoutConfirmDialog from "./LogoutConfirmDialog";
 
 export default function Navigation() {
   const { isAuthenticated, logout } = useAuth();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -15,6 +18,11 @@ export default function Navigation() {
     } catch {
       logout();
     }
+  };
+
+  const handleConfirmLogout = () => {
+    setIsDialogOpen(false);
+    handleLogout();
   };
 
   return (
@@ -62,13 +70,18 @@ export default function Navigation() {
               colorScheme="blue"
               variant="outline"
               size="sm"
-              onClick={handleLogout}
+              onClick={() => setIsDialogOpen(true)}
             >
               ログアウト
             </Button>
           )}
         </Flex>
       </Flex>
+      <LogoutConfirmDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onConfirm={handleConfirmLogout}
+      />
     </Box>
   );
 }

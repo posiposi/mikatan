@@ -6,7 +6,7 @@ export interface AuthContextType {
   setIsAuthenticated: (value: boolean) => void;
   checkAuthStatus: () => Promise<void>;
   refreshAuthStatus: () => void;
-  login: (token: string) => void;
+  login: (token?: string) => void;
   logout: () => void;
 }
 
@@ -36,8 +36,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = (token: string) => {
-    localStorage.setItem("token", token);
+  const login = (token?: string) => {
+    if (token) {
+      localStorage.setItem("token", token);
+    }
     setIsAuthenticated(true);
   };
 

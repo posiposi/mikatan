@@ -40,8 +40,7 @@ export default function LoginPage() {
       });
 
       if (response.ok) {
-        const result = await response.json();
-        login(result.token);
+        login();
         alert("ログインしました。");
         navigate("/");
       } else {
