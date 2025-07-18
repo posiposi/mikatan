@@ -27,11 +27,18 @@ export default function Navigation() {
           </Link>
         </Heading>
         <Spacer />
-        <Link to="/signup">
-          <Button colorScheme="blue" variant="outline" size="sm">
-            会員登録
-          </Button>
-        </Link>
+        <Flex gap={2}>
+          <Link to="/login">
+            <Button colorScheme="blue" variant="outline" size="sm">
+              ログイン
+            </Button>
+          </Link>
+          <Link to="/signup">
+            <Button colorScheme="blue" variant="outline" size="sm">
+              会員登録
+            </Button>
+          </Link>
+        </Flex>
       </Flex>
     </Box>
   );
