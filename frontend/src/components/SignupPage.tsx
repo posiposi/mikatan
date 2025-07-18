@@ -10,6 +10,7 @@ import {
 import { Field } from "@/components/ui/field";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 interface SignupFormData {
   name: string;
@@ -25,6 +26,7 @@ export default function SignupPage() {
     formState: { errors },
   } = useForm<SignupFormData>();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
@@ -35,6 +37,7 @@ export default function SignupPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+        credentials: 'include',
       });
 
       if (signupResponse.ok) {
@@ -47,9 +50,12 @@ export default function SignupPage() {
             email: data.email,
             password: data.password,
           }),
+          credentials: 'include',
         });
 
         if (loginResponse.ok) {
+          const result = await loginResponse.json();
+          login(result.token);
           alert("会員登録が完了しました。自動的にログインしています。");
           navigate("/");
         } else {

@@ -4,6 +4,7 @@ import Navigation from "./components/Navigation";
 import TopPage from "./components/TopPage";
 import SignupPage from "./components/SignupPage";
 import LoginPage from "./components/LoginPage";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const router = createBrowserRouter([
   {
@@ -37,12 +38,14 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <RouterProvider
-      router={router}
-      future={{
-        v7_startTransition: true,
-      }}
-    />
+    <AuthProvider>
+      <RouterProvider
+        router={router}
+        future={{
+          v7_startTransition: true,
+        }}
+      />
+    </AuthProvider>
   );
 }
 

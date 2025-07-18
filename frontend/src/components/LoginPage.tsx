@@ -10,6 +10,7 @@ import {
 import { Field } from "@/components/ui/field";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 interface LoginFormData {
   email: string;
@@ -24,6 +25,7 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginFormData>();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -34,9 +36,12 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+        credentials: 'include',
       });
 
       if (response.ok) {
+        const result = await response.json();
+        login(result.token);
         alert("ログインしました。");
         navigate("/");
       } else {

@@ -1,7 +1,22 @@
 import { Box, Button, Flex, Heading, Spacer } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Navigation() {
+  const { isAuthenticated, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/v1/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      logout();
+    } catch {
+      logout();
+    }
+  };
+
   return (
     <Box
       bg="blue.500"
@@ -28,16 +43,30 @@ export default function Navigation() {
         </Heading>
         <Spacer />
         <Flex gap={2}>
-          <Link to="/login">
-            <Button colorScheme="blue" variant="outline" size="sm">
-              ログイン
+          {!isAuthenticated && (
+            <>
+              <Link to="/login">
+                <Button colorScheme="blue" variant="outline" size="sm">
+                  ログイン
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button colorScheme="blue" variant="outline" size="sm">
+                  会員登録
+                </Button>
+              </Link>
+            </>
+          )}
+          {isAuthenticated && (
+            <Button
+              colorScheme="blue"
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+            >
+              ログアウト
             </Button>
-          </Link>
-          <Link to="/signup">
-            <Button colorScheme="blue" variant="outline" size="sm">
-              会員登録
-            </Button>
-          </Link>
+          )}
         </Flex>
       </Flex>
     </Box>
