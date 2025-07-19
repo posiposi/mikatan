@@ -25,5 +25,5 @@ func main() {
 	userController := controller.NewUserController(userUsecase)
 	itemController := controller.NewItemController(itemUsecase)
 	e := router.NewRouter(userController, itemController)
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.StartTLS(":8080", "/go/src/localhost+2.pem", "/go/src/localhost+2-key.pem"))
 }

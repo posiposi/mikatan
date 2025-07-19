@@ -21,6 +21,8 @@ services:
     volumes:
       - ./backend/:/go/src/
       - .env:/go/src/.env
+      - ./localhost+2.pem:/go/src/localhost+2.pem:ro
+      - ./localhost+2-key.pem:/go/src/localhost+2-key.pem:ro
     ports:
       - "8080:8080"
     depends_on:
@@ -37,7 +39,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./frontend:/app
-      - /app/node_modules
+      - frontend_node_modules:/app/node_modules
+      - ./localhost+2.pem:/app/localhost+2.pem:ro
+      - ./localhost+2-key.pem:/app/localhost+2-key.pem:ro
     ports:
       - "3000:3000"
     tty: true
@@ -113,6 +117,7 @@ services:
 volumes:
   mysql_data:
   test_mysql_data:
+  frontend_node_modules:
 
 networks:
   app_network:

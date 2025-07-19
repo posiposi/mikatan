@@ -39,3 +39,6 @@ yarn-error.log*
 
 # gh issue create template body
 /issue-body-template.md
+
+# .pem
+*.pem
