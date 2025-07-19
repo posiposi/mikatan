@@ -8,7 +8,7 @@ info:
 servers:
   - url: https://mikatan_knitting/v1
     description: Production
-  - url: http://localhost:8080/v1
+  - url: https://localhost:8080/v1
     description: Local
 paths:
   /items:
