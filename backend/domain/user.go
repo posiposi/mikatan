@@ -10,6 +10,7 @@ type User struct {
 	name     string
 	email    *Email
 	password *Password
+	role     *Role
 }
 
 func NewUser(id *UserId, name string, email *Email, password *Password) (*User, error) {
@@ -29,11 +30,44 @@ func NewUser(id *UserId, name string, email *Email, password *Password) (*User, 
 		return nil, fmt.Errorf("password cannot be nil")
 	}
 
+	defaultRole, _ := NewRole("USER")
+
 	return &User{
 		id:       id,
 		name:     name,
 		email:    email,
 		password: password,
+		role:     defaultRole,
+	}, nil
+}
+
+func NewUserWithRole(id *UserId, name string, email *Email, password *Password, role *Role) (*User, error) {
+	if id == nil {
+		return nil, fmt.Errorf("user Id cannot be nil")
+	}
+
+	if strings.TrimSpace(name) == "" {
+		return nil, fmt.Errorf("user name cannot be empty")
+	}
+
+	if email == nil {
+		return nil, fmt.Errorf("email cannot be nil")
+	}
+
+	if password == nil {
+		return nil, fmt.Errorf("password cannot be nil")
+	}
+
+	if role == nil {
+		return nil, fmt.Errorf("role cannot be nil")
+	}
+
+	return &User{
+		id:       id,
+		name:     name,
+		email:    email,
+		password: password,
+		role:     role,
 	}, nil
 }
 
@@ -51,6 +85,10 @@ func (u *User) Email() *Email {
 
 func (u *User) Password() *Password {
 	return u.password
+}
+
+func (u *User) Role() *Role {
+	return u.role
 }
 
 func (u *User) Equals(other *User) bool {
