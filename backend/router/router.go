@@ -9,7 +9,7 @@ import (
 	"github.com/posiposi/project/backend/validator"
 )
 
-func NewRouter(uc controller.IUserController, ic controller.IItemController, aic controller.IAdminItemController, userRepo authMiddleware.UserRepository) *echo.Echo {
+func NewRouter(uc controller.IUserController, ic controller.IItemController, aic controller.IAdminItemController, aac controller.IAdminAuthController, userRepo authMiddleware.UserRepository) *echo.Echo {
 	e := echo.New()
 	e.Validator = validator.NewValidator()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -28,6 +28,7 @@ func NewRouter(uc controller.IUserController, ic controller.IItemController, aic
 	i.POST("", ic.CreateItem, authMiddleware.AuthMiddleware())
 	
 	admin := g.Group("/admin", authMiddleware.AuthMiddleware(), authMiddleware.AdminMiddleware(userRepo))
+	admin.GET("/auth/check", aac.CheckAdminAuth)
 	adminItems := admin.Group("/items")
 	adminItems.GET("", aic.GetAllItems)
 	adminItems.GET("/:id", aic.GetItemByID)
