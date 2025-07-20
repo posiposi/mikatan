@@ -153,7 +153,7 @@ func (ir *itemRepository) UpdateItem(item *domain.Item) (*domain.Item, error) {
 		Description: item.Description(),
 	}
 
-	result := ir.db.Where("item_id = ?", item.ItemId()).Updates(&ormItem)
+	result := ir.db.Where("item_id = ?", item.ItemId()).Select("item_name", "stock", "description").Updates(&ormItem)
 	if result.Error != nil {
 		return nil, result.Error
 	}
