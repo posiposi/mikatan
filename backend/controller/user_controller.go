@@ -108,5 +108,16 @@ func (uc *userController) LogOut(c echo.Context) error {
 }
 
 func (uc *userController) CheckAuth(c echo.Context) error {
-	return c.JSON(http.StatusOK, map[string]bool{"authenticated": true})
+	userId, ok := c.Get("user_id").(string)
+	if !ok || userId == "" {
+		return c.JSON(http.StatusUnauthorized, "user_id not found in context")
+	}
+
+	user, err := uc.uu.GetUserById(userId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := uc.up.ToAuthCheckJSON(user)
+	return c.JSON(http.StatusOK, response)
 }

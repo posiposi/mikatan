@@ -8,7 +8,7 @@ import (
 )
 
 type UserRepository interface {
-	GetUserByID(userID string) (*domain.User, error)
+	GetUserById(userId *domain.UserId) (*domain.User, error)
 }
 
 func AdminMiddleware(userRepo UserRepository) echo.MiddlewareFunc {
@@ -24,7 +24,12 @@ func AdminMiddleware(userRepo UserRepository) echo.MiddlewareFunc {
 				return c.JSON(http.StatusUnauthorized, "invalid user id")
 			}
 
-			user, err := userRepo.GetUserByID(userIDStr)
+			userIdDomain, err := domain.NewUserId(userIDStr)
+			if err != nil {
+				return c.JSON(http.StatusUnauthorized, "invalid user id format")
+			}
+
+			user, err := userRepo.GetUserById(userIdDomain)
 			if err != nil {
 				return c.JSON(http.StatusUnauthorized, "user not found")
 			}

@@ -16,9 +16,19 @@ type LoginResponseJSON struct {
 	User  UserResponseJSON `json:"user"`
 }
 
+type AuthCheckResponseJSON struct {
+	Authenticated bool   `json:"authenticated"`
+	UserId        string `json:"user_id"`
+	Name          string `json:"name"`
+	Email         string `json:"email"`
+	Role          string `json:"role"`
+	IsAdmin       bool   `json:"is_admin"`
+}
+
 type IUserPresenter interface {
 	ToJSON(user *domain.User) UserResponseJSON
 	ToLoginJSON(token string, user *domain.User) LoginResponseJSON
+	ToAuthCheckJSON(user *domain.User) AuthCheckResponseJSON
 }
 
 type userPresenter struct{}
@@ -40,5 +50,16 @@ func (p *userPresenter) ToLoginJSON(token string, user *domain.User) LoginRespon
 	return LoginResponseJSON{
 		Token: token,
 		User:  p.ToJSON(user),
+	}
+}
+
+func (p *userPresenter) ToAuthCheckJSON(user *domain.User) AuthCheckResponseJSON {
+	return AuthCheckResponseJSON{
+		Authenticated: true,
+		UserId:        user.Id().Value(),
+		Name:          user.Name(),
+		Email:         user.Email().Value(),
+		Role:          user.Role().Value(),
+		IsAdmin:       user.Role().Value() == "ADMINISTRATOR",
 	}
 }

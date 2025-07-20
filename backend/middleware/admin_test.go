@@ -15,8 +15,8 @@ type MockUserRepository struct {
 	mock.Mock
 }
 
-func (m *MockUserRepository) GetUserByID(userID string) (*domain.User, error) {
-	args := m.Called(userID)
+func (m *MockUserRepository) GetUserById(userId *domain.UserId) (*domain.User, error) {
+	args := m.Called(userId)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
@@ -39,7 +39,7 @@ func TestAdminMiddleware_WithAdminUser_ShouldProceed(t *testing.T) {
 	adminUser, _ := domain.NewUserWithRole(userId, "Admin User", email, password, role)
 
 	mockRepo := new(MockUserRepository)
-	mockRepo.On("GetUserByID", adminUserID).Return(adminUser, nil)
+	mockRepo.On("GetUserById", userId).Return(adminUser, nil)
 
 	called := false
 	nextHandler := func(c echo.Context) error {
@@ -72,7 +72,7 @@ func TestAdminMiddleware_WithNonAdminUser_ShouldReturnForbidden(t *testing.T) {
 	regularUser, _ := domain.NewUserWithRole(userId, "Regular User", email, password, role)
 
 	mockRepo := new(MockUserRepository)
-	mockRepo.On("GetUserByID", regularUserID).Return(regularUser, nil)
+	mockRepo.On("GetUserById", userId).Return(regularUser, nil)
 
 	called := false
 	nextHandler := func(c echo.Context) error {
