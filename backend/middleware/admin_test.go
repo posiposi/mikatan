@@ -29,16 +29,17 @@ func TestAdminMiddleware_WithAdminUser_ShouldProceed(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	c.Set("user_id", "admin-user-id")
+	adminUserID := "f47ac10b-58cc-4372-a567-0e02b2c3d500"
+	c.Set("user_id", adminUserID)
 
-	userId, _ := domain.NewUserId("admin-user-id")
+	userId, _ := domain.NewUserId(adminUserID)
 	email, _ := domain.NewEmail("admin@example.com")
 	password, _ := domain.NewPassword("password123")
 	role, _ := domain.NewRole("ADMINISTRATOR")
 	adminUser, _ := domain.NewUserWithRole(userId, "Admin User", email, password, role)
 
 	mockRepo := new(MockUserRepository)
-	mockRepo.On("GetUserByID", "admin-user-id").Return(adminUser, nil)
+	mockRepo.On("GetUserByID", adminUserID).Return(adminUser, nil)
 
 	called := false
 	nextHandler := func(c echo.Context) error {
@@ -61,16 +62,17 @@ func TestAdminMiddleware_WithNonAdminUser_ShouldReturnForbidden(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	c.Set("user_id", "regular-user-id")
+	regularUserID := "f47ac10b-58cc-4372-a567-0e02b2c3d501"
+	c.Set("user_id", regularUserID)
 
-	userId, _ := domain.NewUserId("regular-user-id")
+	userId, _ := domain.NewUserId(regularUserID)
 	email, _ := domain.NewEmail("user@example.com")
 	password, _ := domain.NewPassword("password123")
 	role, _ := domain.NewRole("USER")
 	regularUser, _ := domain.NewUserWithRole(userId, "Regular User", email, password, role)
 
 	mockRepo := new(MockUserRepository)
-	mockRepo.On("GetUserByID", "regular-user-id").Return(regularUser, nil)
+	mockRepo.On("GetUserByID", regularUserID).Return(regularUser, nil)
 
 	called := false
 	nextHandler := func(c echo.Context) error {
