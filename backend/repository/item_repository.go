@@ -9,7 +9,10 @@ import (
 
 type IItemRepository interface {
 	GetAllItems() (domain.Items, error)
+	GetItemByID(itemId *domain.ItemId) (*domain.Item, error)
 	CreateItem(item *domain.Item) (*domain.Item, error)
+	UpdateItem(item *domain.Item) (*domain.Item, error)
+	DeleteItem(itemId *domain.ItemId) error
 }
 
 type itemRepository struct {
@@ -104,4 +107,101 @@ func (ir *itemRepository) CreateItem(item *domain.Item) (*domain.Item, error) {
 	}
 
 	return createdItem, nil
+}
+
+func (ir *itemRepository) GetItemByID(itemId *domain.ItemId) (*domain.Item, error) {
+	var ormItem model.Item
+	if err := ir.db.Where("item_id = ?", itemId.Value()).First(&ormItem).Error; err != nil {
+		return nil, err
+	}
+
+	itemIdValue, err := domain.NewItemId(ormItem.ItemId)
+	if err != nil {
+		return nil, err
+	}
+	userId, err := domain.NewUserId(ormItem.UserId)
+	if err != nil {
+		return nil, err
+	}
+	itemName, err := domain.NewItemName(ormItem.ItemName)
+	if err != nil {
+		return nil, err
+	}
+	stock, err := domain.NewStock(ormItem.Stock)
+	if err != nil {
+		return nil, err
+	}
+	description, err := domain.NewDescription(ormItem.Description)
+	if err != nil {
+		return nil, err
+	}
+
+	item, err := domain.NewItem(itemIdValue, *userId, *itemName, *stock, *description)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
+}
+
+func (ir *itemRepository) UpdateItem(item *domain.Item) (*domain.Item, error) {
+	ormItem := model.Item{
+		ItemId:      item.ItemId(),
+		UserId:      item.UserId(),
+		ItemName:    item.ItemName(),
+		Stock:       item.Stock(),
+		Description: item.Description(),
+	}
+
+	result := ir.db.Where("item_id = ?", item.ItemId()).Updates(&ormItem)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+
+	var updatedOrmItem model.Item
+	if err := ir.db.Where("item_id = ?", item.ItemId()).First(&updatedOrmItem).Error; err != nil {
+		return nil, err
+	}
+
+	itemId, err := domain.NewItemId(updatedOrmItem.ItemId)
+	if err != nil {
+		return nil, err
+	}
+	userId, err := domain.NewUserId(updatedOrmItem.UserId)
+	if err != nil {
+		return nil, err
+	}
+	itemName, err := domain.NewItemName(updatedOrmItem.ItemName)
+	if err != nil {
+		return nil, err
+	}
+	stock, err := domain.NewStock(updatedOrmItem.Stock)
+	if err != nil {
+		return nil, err
+	}
+	description, err := domain.NewDescription(updatedOrmItem.Description)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedItem, err := domain.NewItem(itemId, *userId, *itemName, *stock, *description)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedItem, nil
+}
+
+func (ir *itemRepository) DeleteItem(itemId *domain.ItemId) error {
+	result := ir.db.Where("item_id = ?", itemId.Value()).Delete(&model.Item{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }

@@ -213,3 +213,179 @@ func TestCreateItem(t *testing.T) {
 		assert.Nil(t, createdItem)
 	})
 }
+
+func TestGetItemByID(t *testing.T) {
+	t.Run("Get Item By ID - Success", func(t *testing.T) {
+		tx := db.Begin()
+		defer tx.Rollback()
+
+		userId := "f47ac10b-58cc-4372-a567-0e02b2c3d400"
+		user := model.User{UserId: userId, Name: "TestUser", Email: "test400@example.com", Password: "password"}
+		if err := tx.Create(&user).Error; err != nil {
+			t.Fatal(err)
+		}
+
+		itemId := "f47ac10b-58cc-4372-a567-0e02b2c3d401"
+		item := model.Item{
+			ItemId:      itemId,
+			UserId:      userId,
+			ItemName:    "Test Item",
+			Stock:       true,
+			Description: "Test Description",
+		}
+		if err := tx.Create(&item).Error; err != nil {
+			t.Fatal(err)
+		}
+
+		itemIdValue, err := domain.NewItemId(itemId)
+		assert.NoError(t, err)
+
+		repo := NewItemRepository(tx)
+		result, err := repo.GetItemByID(itemIdValue)
+		assert.NoError(t, err)
+		assert.NotNil(t, result)
+		assert.Equal(t, itemId, result.ItemId())
+		assert.Equal(t, "Test Item", result.ItemName())
+		assert.Equal(t, true, result.Stock())
+		assert.Equal(t, "Test Description", result.Description())
+	})
+
+	t.Run("Get Item By ID - Not Found", func(t *testing.T) {
+		tx := db.Begin()
+		defer tx.Rollback()
+
+		itemIdValue, err := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d999")
+		assert.NoError(t, err)
+
+		repo := NewItemRepository(tx)
+		result, err := repo.GetItemByID(itemIdValue)
+		assert.Error(t, err)
+		assert.Nil(t, result)
+	})
+}
+
+func TestUpdateItem(t *testing.T) {
+	t.Run("Update Item - Success", func(t *testing.T) {
+		tx := db.Begin()
+		defer tx.Rollback()
+
+		userId := "f47ac10b-58cc-4372-a567-0e02b2c3d500"
+		user := model.User{UserId: userId, Name: "TestUser", Email: "test500@example.com", Password: "password"}
+		if err := tx.Create(&user).Error; err != nil {
+			t.Fatal(err)
+		}
+
+		itemId := "f47ac10b-58cc-4372-a567-0e02b2c3d501"
+		originalItem := model.Item{
+			ItemId:      itemId,
+			UserId:      userId,
+			ItemName:    "Original Item",
+			Stock:       true,
+			Description: "Original Description",
+		}
+		if err := tx.Create(&originalItem).Error; err != nil {
+			t.Fatal(err)
+		}
+
+		itemIdValue, err := domain.NewItemId(itemId)
+		assert.NoError(t, err)
+		userIdValue, err := domain.NewUserId(userId)
+		assert.NoError(t, err)
+		itemName, err := domain.NewItemName("Updated Item")
+		assert.NoError(t, err)
+		stock, err := domain.NewStock(false)
+		assert.NoError(t, err)
+		description, err := domain.NewDescription("Updated Description")
+		assert.NoError(t, err)
+		updatedItem, err := domain.NewItem(itemIdValue, *userIdValue, *itemName, *stock, *description)
+		assert.NoError(t, err)
+
+		repo := NewItemRepository(tx)
+		result, err := repo.UpdateItem(updatedItem)
+		assert.NoError(t, err)
+		assert.NotNil(t, result)
+		assert.Equal(t, itemId, result.ItemId())
+		assert.Equal(t, "Updated Item", result.ItemName())
+		assert.Equal(t, false, result.Stock())
+		assert.Equal(t, "Updated Description", result.Description())
+
+		var savedItem model.Item
+		err = tx.Where("item_id = ?", itemId).First(&savedItem).Error
+		assert.NoError(t, err)
+		assert.Equal(t, "Updated Item", savedItem.ItemName)
+		assert.Equal(t, false, savedItem.Stock)
+		assert.Equal(t, "Updated Description", savedItem.Description)
+	})
+
+	t.Run("Update Item - Not Found", func(t *testing.T) {
+		tx := db.Begin()
+		defer tx.Rollback()
+
+		itemIdValue, err := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d999")
+		assert.NoError(t, err)
+		userIdValue, err := domain.NewUserId("f47ac10b-58cc-4372-a567-0e02b2c3d999")
+		assert.NoError(t, err)
+		itemName, err := domain.NewItemName("Non-existent Item")
+		assert.NoError(t, err)
+		stock, err := domain.NewStock(true)
+		assert.NoError(t, err)
+		description, err := domain.NewDescription("Non-existent Description")
+		assert.NoError(t, err)
+		item, err := domain.NewItem(itemIdValue, *userIdValue, *itemName, *stock, *description)
+		assert.NoError(t, err)
+
+		repo := NewItemRepository(tx)
+		result, err := repo.UpdateItem(item)
+		assert.Error(t, err)
+		assert.Nil(t, result)
+	})
+}
+
+func TestDeleteItem(t *testing.T) {
+	t.Run("Delete Item - Success", func(t *testing.T) {
+		tx := db.Begin()
+		defer tx.Rollback()
+
+		userId := "f47ac10b-58cc-4372-a567-0e02b2c3d600"
+		user := model.User{UserId: userId, Name: "TestUser", Email: "test600@example.com", Password: "password"}
+		if err := tx.Create(&user).Error; err != nil {
+			t.Fatal(err)
+		}
+
+		itemId := "f47ac10b-58cc-4372-a567-0e02b2c3d601"
+		item := model.Item{
+			ItemId:      itemId,
+			UserId:      userId,
+			ItemName:    "Item to Delete",
+			Stock:       true,
+			Description: "Description to Delete",
+		}
+		if err := tx.Create(&item).Error; err != nil {
+			t.Fatal(err)
+		}
+
+		itemIdValue, err := domain.NewItemId(itemId)
+		assert.NoError(t, err)
+
+		repo := NewItemRepository(tx)
+		err = repo.DeleteItem(itemIdValue)
+		assert.NoError(t, err)
+
+		var deletedItem model.Item
+		err = tx.Where("item_id = ?", itemId).First(&deletedItem).Error
+		assert.Error(t, err)
+		assert.True(t, gorm.ErrRecordNotFound == err)
+	})
+
+	t.Run("Delete Item - Not Found", func(t *testing.T) {
+		tx := db.Begin()
+		defer tx.Rollback()
+
+		itemIdValue, err := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d999")
+		assert.NoError(t, err)
+
+		repo := NewItemRepository(tx)
+		err = repo.DeleteItem(itemIdValue)
+		assert.Error(t, err)
+	})
+}
