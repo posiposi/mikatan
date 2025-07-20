@@ -24,6 +24,7 @@ func main() {
 	itemUsecase := usecase.NewItemUsecase(itemRepository)
 	userController := controller.NewUserController(userUsecase)
 	itemController := controller.NewItemController(itemUsecase)
-	e := router.NewRouter(userController, itemController)
+	adminItemController := controller.NewAdminItemController(itemUsecase)
+	e := router.NewRouter(userController, itemController, adminItemController, userRepository)
 	e.Logger.Fatal(e.StartTLS(":8080", "/go/src/localhost+2.pem", "/go/src/localhost+2-key.pem"))
 }
