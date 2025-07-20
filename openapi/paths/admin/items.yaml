@@ -1,0 +1,92 @@
+get:
+  summary: 管理者用アイテム一覧取得
+  description: 管理者権限でアイテム一覧を取得します
+  operationId: getAdminAllItems
+  tags:
+    - admin-items
+  security:
+    - bearerAuth: []
+    - cookieAuth: []
+  responses:
+    '200':
+      $ref: "../../components/responses/item/200Success.yaml"
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "認証が必要です"
+    '403':
+      description: 管理者権限エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "管理者権限が必要です"
+
+post:
+  summary: 管理者用アイテム作成
+  description: 管理者権限でアイテムを作成します
+  operationId: createAdminItemByAdmin
+  tags:
+    - admin-items
+  security:
+    - bearerAuth: []
+    - cookieAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - item_name
+          properties:
+            item_name:
+              type: string
+              description: アイテム名
+              example: "管理者作成アイテム"
+            stock:
+              type: boolean
+              description: 在庫状況
+              example: true
+            description:
+              type: string
+              description: アイテム説明
+              example: "管理者が作成したテストアイテムです"
+  responses:
+    '201':
+      description: アイテム作成成功
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/item/item.yaml"
+    '400':
+      $ref: "../../components/responses/common/400BadRequest.yaml"
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "認証が必要です"
+    '403':
+      description: 管理者権限エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "管理者権限が必要です"

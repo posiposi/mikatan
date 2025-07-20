@@ -15,6 +15,10 @@ paths:
     $ref: "./paths/item/items.yaml"
   /items/{item_id}:
     $ref: "./paths/item/items_itemId.yaml"
+  /admin/items:
+    $ref: "./paths/admin/items.yaml"
+  /admin/items/{item_id}:
+    $ref: "./paths/admin/items_itemId.yaml"
 components:
   securitySchemes:
     bearerAuth:
@@ -30,3 +34,5 @@ components:
 tags:
   - name: items
     description: 商品に関するAPI群
+  - name: admin-items
+    description: 管理者向け商品管理API群

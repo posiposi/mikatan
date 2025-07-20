@@ -1,6 +1,6 @@
 delete:
   summary: 商品削除API
-  operationId: delete.items
+  operationId: deleteItemById
   description: 該当idの商品を削除する
   tags:
     - items

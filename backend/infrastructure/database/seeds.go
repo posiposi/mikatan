@@ -15,10 +15,12 @@ func (m *DBManager) seedUsers() error {
 		id := uuid.NewString()
 		name := "test_user" + strconv.Itoa(i)
 		user := model.User{
-			UserId:    id,
+			Id:        id,
 			Name:      name,
 			Email:     name + "@example.com",
 			Password:  "password",
+			Role:      "USER",
+			IsAdmin:   false,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		}

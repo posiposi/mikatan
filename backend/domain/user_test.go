@@ -29,6 +29,32 @@ func TestNewUser(t *testing.T) {
 	if !user.Password().Equals(password) {
 		t.Errorf("Password() returned %v, expected %v", user.Password(), password)
 	}
+	if user.Role() == nil {
+		t.Errorf("Role() returned nil, expected default USER role")
+	}
+	if user.Role().Value() != "USER" {
+		t.Errorf("Role() returned %s, expected USER", user.Role().Value())
+	}
+}
+
+func TestNewUserWithRole(t *testing.T) {
+	userId, _ := NewUserId(uuid.NewString())
+	name := "Test User"
+	email, _ := NewEmail("test@example.com")
+	password, _ := NewPassword("password123")
+	role, _ := NewRole("ADMINISTRATOR")
+
+	user, err := NewUserWithRole(userId, name, email, password, role)
+	if err != nil {
+		t.Errorf("NewUserWithRole() returned an error: %v", err)
+	}
+
+	if user.Role() == nil {
+		t.Errorf("Role() returned nil")
+	}
+	if user.Role().Value() != "ADMINISTRATOR" {
+		t.Errorf("Role() returned %s, expected ADMINISTRATOR", user.Role().Value())
+	}
 }
 
 func TestNewUserWithEmptyNameError(t *testing.T) {

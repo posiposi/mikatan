@@ -1,6 +1,9 @@
 get:
   summary: 全商品取得API
   description: itemsテーブルに存在する全商品を取得する
+  operationId: getAllItems
+  tags:
+    - items
   responses:
     "200":
       description: Success
@@ -33,6 +36,7 @@ get:
 post:
   summary: 商品作成API
   description: 新しい商品を作成します
+  operationId: createItem
   tags:
     - items
   security:

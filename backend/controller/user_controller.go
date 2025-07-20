@@ -6,8 +6,9 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/posiposi/project/backend/model"
+	"github.com/posiposi/project/backend/presenter"
 	"github.com/posiposi/project/backend/usecase"
+	"github.com/posiposi/project/backend/usecase/request"
 )
 
 type IUserController interface {
@@ -19,34 +20,66 @@ type IUserController interface {
 
 type userController struct {
 	uu usecase.IUserUsecase
+	up presenter.IUserPresenter
 }
 
 func NewUserController(uu usecase.IUserUsecase) IUserController {
-	return &userController{uu}
+	up := presenter.NewUserPresenter()
+	return &userController{uu, up}
 }
 
 func (uc *userController) SignUp(c echo.Context) error {
-	user := model.User{}
-	if err := c.Bind(&user); err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+	var req struct {
+		Name     string `json:"name" validate:"required"`
+		Email    string `json:"email" validate:"required,email"`
+		Password string `json:"password" validate:"required,min=8"`
 	}
-	userRes, err := uc.uu.SignUp(user)
+	
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	if err := c.Validate(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	
+	signUpReq := request.SignUpRequest{
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: req.Password,
+	}
+	
+	user, err := uc.uu.SignUp(signUpReq)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusCreated, userRes)
+	
+	response := uc.up.ToJSON(user)
+	return c.JSON(http.StatusCreated, response)
 }
 
 func (uc *userController) LogIn(c echo.Context) error {
-	user := model.User{}
-	// 不正リクエストバリデーション
-	if err := c.Bind(&user); err != nil {
+	var req struct {
+		Email    string `json:"email" validate:"required,email"`
+		Password string `json:"password" validate:"required"`
+	}
+	
+	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	tokenString, err := uc.uu.Login(user)
+	if err := c.Validate(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	
+	logInReq := request.LogInRequest{
+		Email:    req.Email,
+		Password: req.Password,
+	}
+	
+	tokenString, user, err := uc.uu.Login(logInReq)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, err.Error())
 	}
+	
 	cookie := new(http.Cookie)
 	cookie.Name = "token"
 	cookie.Value = tokenString
@@ -56,7 +89,9 @@ func (uc *userController) LogIn(c echo.Context) error {
 	cookie.HttpOnly = true
 	cookie.SameSite = http.SameSiteNoneMode
 	c.SetCookie(cookie)
-	return c.JSON(http.StatusOK, map[string]string{"token": tokenString})
+	
+	response := uc.up.ToLoginJSON(tokenString, user)
+	return c.JSON(http.StatusOK, response)
 }
 
 func (uc *userController) LogOut(c echo.Context) error {
@@ -73,5 +108,16 @@ func (uc *userController) LogOut(c echo.Context) error {
 }
 
 func (uc *userController) CheckAuth(c echo.Context) error {
-	return c.JSON(http.StatusOK, map[string]bool{"authenticated": true})
+	userId, ok := c.Get("user_id").(string)
+	if !ok || userId == "" {
+		return c.JSON(http.StatusUnauthorized, "user_id not found in context")
+	}
+
+	user, err := uc.uu.GetUserById(userId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := uc.up.ToAuthCheckJSON(user)
+	return c.JSON(http.StatusOK, response)
 }
