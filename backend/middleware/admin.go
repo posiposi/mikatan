@@ -37,8 +37,7 @@ func AdminMiddleware(userRepo UserRepository) echo.MiddlewareFunc {
 				return c.JSON(http.StatusUnauthorized, "user role is nil")
 			}
 
-			adminPermission, _ := domain.NewPermission("ADMIN")
-			if !user.Role().HasPermission(adminPermission) {
+			if user.Role().Value() != "ADMINISTRATOR" {
 				return c.JSON(http.StatusForbidden, "admin permission required")
 			}
 

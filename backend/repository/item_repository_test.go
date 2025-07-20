@@ -9,6 +9,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"github.com/posiposi/project/backend/domain"
 	"github.com/posiposi/project/backend/internal/orm/model"
@@ -135,13 +136,13 @@ func TestCreateItem(t *testing.T) {
 		tx := db.Begin()
 		defer tx.Rollback()
 
-		userId := "f47ac10b-58cc-4372-a567-0e02b2c3d250"
+		userId := uuid.New().String()
 		user := model.User{UserId: userId, Name: "TestUser", Email: "test250@example.com", Password: "password"}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
 
-		itemId, err := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d251")
+		itemId, err := domain.NewItemId(uuid.New().String())
 		assert.NoError(t, err)
 		userIdValue, err := domain.NewUserId(userId)
 		assert.NoError(t, err)
@@ -176,13 +177,13 @@ func TestCreateItem(t *testing.T) {
 		tx := db.Begin()
 		defer tx.Rollback()
 
-		userId := "f47ac10b-58cc-4372-a567-0e02b2c3d300"
+		userId := uuid.New().String()
 		user := model.User{UserId: userId, Name: "TestUser", Email: "test3@example.com", Password: "password"}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
 
-		itemId := "f47ac10b-58cc-4372-a567-0e02b2c3d301"
+		itemId := uuid.New().String()
 		firstItem := model.Item{
 			ItemId:      itemId,
 			UserId:      userId,
@@ -321,9 +322,9 @@ func TestUpdateItem(t *testing.T) {
 		tx := db.Begin()
 		defer tx.Rollback()
 
-		itemIdValue, err := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d999")
+		itemIdValue, err := domain.NewItemId(uuid.New().String())
 		assert.NoError(t, err)
-		userIdValue, err := domain.NewUserId("f47ac10b-58cc-4372-a567-0e02b2c3d999")
+		userIdValue, err := domain.NewUserId(uuid.New().String())
 		assert.NoError(t, err)
 		itemName, err := domain.NewItemName("Non-existent Item")
 		assert.NoError(t, err)
@@ -346,13 +347,13 @@ func TestDeleteItem(t *testing.T) {
 		tx := db.Begin()
 		defer tx.Rollback()
 
-		userId := "f47ac10b-58cc-4372-a567-0e02b2c3d600"
+		userId := uuid.New().String()
 		user := model.User{UserId: userId, Name: "TestUser", Email: "test600@example.com", Password: "password"}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
 
-		itemId := "f47ac10b-58cc-4372-a567-0e02b2c3d601"
+		itemId := uuid.New().String()
 		item := model.Item{
 			ItemId:      itemId,
 			UserId:      userId,
@@ -381,7 +382,7 @@ func TestDeleteItem(t *testing.T) {
 		tx := db.Begin()
 		defer tx.Rollback()
 
-		itemIdValue, err := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d999")
+		itemIdValue, err := domain.NewItemId(uuid.New().String())
 		assert.NoError(t, err)
 
 		repo := NewItemRepository(tx)

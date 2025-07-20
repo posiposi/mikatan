@@ -10,14 +10,48 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/posiposi/project/backend/domain"
-	"github.com/posiposi/project/backend/model"
 	"github.com/posiposi/project/backend/presenter"
+	"github.com/posiposi/project/backend/usecase/request"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-type MockItemUsecase struct {
+type MockItemUsecaseForUserController struct {
 	mock.Mock
+}
+
+func (m *MockItemUsecaseForUserController) GetAllItems() ([]*domain.Item, error) {
+	args := m.Called()
+	return args.Get(0).([]*domain.Item), args.Error(1)
+}
+
+func (m *MockItemUsecaseForUserController) GetItemByID(itemId string) (*domain.Item, error) {
+	args := m.Called(itemId)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.Item), args.Error(1)
+}
+
+func (m *MockItemUsecaseForUserController) CreateItem(req request.CreateItemRequest) (*domain.Item, error) {
+	args := m.Called(req)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.Item), args.Error(1)
+}
+
+func (m *MockItemUsecaseForUserController) UpdateItem(req request.UpdateItemRequest) (*domain.Item, error) {
+	args := m.Called(req)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.Item), args.Error(1)
+}
+
+func (m *MockItemUsecaseForUserController) DeleteItem(itemId string) error {
+	args := m.Called(itemId)
+	return args.Error(0)
 }
 
 type MockValidator struct {
@@ -31,29 +65,16 @@ func (m *MockValidator) Validate(i interface{}) error {
 	return nil
 }
 
-func (m *MockItemUsecase) GetAllItems() ([]*domain.Item, error) {
-	args := m.Called()
-	return args.Get(0).([]*domain.Item), args.Error(1)
-}
-
-func (m *MockItemUsecase) CreateItem(item model.Item, userId string) (*domain.Item, error) {
-	args := m.Called(item, userId)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*domain.Item), args.Error(1)
-}
-
 func TestCreateItem_Success(t *testing.T) {
 	e := echo.New()
 	e.Validator = &MockValidator{}
-	mockUsecase := new(MockItemUsecase)
+	mockUsecase := new(MockItemUsecaseForUserController)
 	controller := NewItemController(mockUsecase)
 
-	reqBody := model.Item{
-		ItemName:    "Test Item",
-		Stock:       true,
-		Description: "Test Description",
+	reqBody := map[string]interface{}{
+		"item_name":   "Test Item",
+		"stock":       true,
+		"description": "Test Description",
 	}
 	jsonBody, _ := json.Marshal(reqBody)
 
@@ -61,9 +82,16 @@ func TestCreateItem_Success(t *testing.T) {
 	itemName, _ := domain.NewItemName("Test Item")
 	stock, _ := domain.NewStock(true)
 	description, _ := domain.NewDescription("Test Description")
-	expectedDomainItem, _ := domain.NewItem(nil, *userId, *itemName, *stock, *description)
+	itemId, _ := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d401")
+	expectedDomainItem, _ := domain.NewItem(itemId, *userId, *itemName, *stock, *description)
 
-	mockUsecase.On("CreateItem", reqBody, "f47ac10b-58cc-4372-a567-0e02b2c3d400").Return(expectedDomainItem, nil)
+	expectedReq := request.CreateItemRequest{
+		ItemName:    "Test Item",
+		Stock:       true,
+		Description: "Test Description",
+		UserId:      "f47ac10b-58cc-4372-a567-0e02b2c3d400",
+	}
+	mockUsecase.On("CreateItem", expectedReq).Return(expectedDomainItem, nil)
 	req := httptest.NewRequest(http.MethodPost, "/v1/items", bytes.NewReader(jsonBody))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -86,7 +114,7 @@ func TestCreateItem_Success(t *testing.T) {
 
 func TestCreateItem_InvalidJSON(t *testing.T) {
 	e := echo.New()
-	mockUsecase := new(MockItemUsecase)
+	mockUsecase := new(MockItemUsecaseForUserController)
 	controller := NewItemController(mockUsecase)
 
 	req := httptest.NewRequest(http.MethodPost, "/v1/items", bytes.NewReader([]byte("invalid json")))
@@ -104,13 +132,13 @@ func TestCreateItem_InvalidJSON(t *testing.T) {
 func TestCreateItem_ValidationError(t *testing.T) {
 	e := echo.New()
 	e.Validator = &MockValidator{shouldFail: true}
-	mockUsecase := new(MockItemUsecase)
+	mockUsecase := new(MockItemUsecaseForUserController)
 	controller := NewItemController(mockUsecase)
 
-	reqBody := model.Item{
-		ItemName:    "",
-		Stock:       true,
-		Description: "Test Description",
+	reqBody := map[string]interface{}{
+		"item_name":   "",
+		"stock":       true,
+		"description": "Test Description",
 	}
 	jsonBody, _ := json.Marshal(reqBody)
 
@@ -129,13 +157,13 @@ func TestCreateItem_ValidationError(t *testing.T) {
 func TestCreateItem_MissingUserId(t *testing.T) {
 	e := echo.New()
 	e.Validator = &MockValidator{}
-	mockUsecase := new(MockItemUsecase)
+	mockUsecase := new(MockItemUsecaseForUserController)
 	controller := NewItemController(mockUsecase)
 
-	reqBody := model.Item{
-		ItemName:    "Test Item",
-		Stock:       true,
-		Description: "Test Description",
+	reqBody := map[string]interface{}{
+		"item_name":   "Test Item",
+		"stock":       true,
+		"description": "Test Description",
 	}
 	jsonBody, _ := json.Marshal(reqBody)
 
@@ -153,16 +181,22 @@ func TestCreateItem_MissingUserId(t *testing.T) {
 func TestCreateItem_UsecaseError(t *testing.T) {
 	e := echo.New()
 	e.Validator = &MockValidator{}
-	mockUsecase := new(MockItemUsecase)
+	mockUsecase := new(MockItemUsecaseForUserController)
 	controller := NewItemController(mockUsecase)
 
-	reqBody := model.Item{
+	reqBody := map[string]interface{}{
+		"item_name":   "Test Item",
+		"stock":       true,
+		"description": "Test Description",
+	}
+	jsonBody, _ := json.Marshal(reqBody)
+	expectedReq := request.CreateItemRequest{
 		ItemName:    "Test Item",
 		Stock:       true,
 		Description: "Test Description",
+		UserId:      "f47ac10b-58cc-4372-a567-0e02b2c3d400",
 	}
-	jsonBody, _ := json.Marshal(reqBody)
-	mockUsecase.On("CreateItem", reqBody, "f47ac10b-58cc-4372-a567-0e02b2c3d400").Return(nil, errors.New("usecase error"))
+	mockUsecase.On("CreateItem", expectedReq).Return(nil, errors.New("usecase error"))
 	req := httptest.NewRequest(http.MethodPost, "/v1/items", bytes.NewReader(jsonBody))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()

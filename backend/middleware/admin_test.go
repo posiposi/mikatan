@@ -51,6 +51,7 @@ func TestAdminMiddleware_WithAdminUser_ShouldProceed(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.True(t, called)
+	assert.Equal(t, http.StatusOK, rec.Code)
 	mockRepo.AssertExpectations(t)
 }
 
