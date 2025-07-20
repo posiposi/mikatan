@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useState, useEffect } from 'react';
-import { get } from '../utils/api';
+import React, { createContext, useState, useEffect } from "react";
+import { get } from "../utils/api";
 
 export interface AuthContextType {
   isAuthenticated: boolean;
@@ -9,17 +9,22 @@ export interface AuthContextType {
   refreshAuthStatus: () => void;
   login: (token?: string) => void;
   logout: () => void;
+  isAdmin: boolean;
+  checkAdminStatus: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const checkAuthStatus = async () => {
     try {
-      const response = await get('/v1/auth/check', true);
-      
+      const response = await get("/v1/auth/check", true);
+
       if (response.ok) {
         setIsAuthenticated(true);
       } else if (response.status === 401) {
@@ -42,9 +47,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthenticated(true);
   };
 
+  const checkAdminStatus = async () => {
+    try {
+      const response = await get("/v1/admin/auth/check", true);
+
+      if (response.ok) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    } catch {
+      setIsAdmin(false);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     setIsAuthenticated(false);
+    setIsAdmin(false);
   };
 
   // 初期状態をlocalStorageベースで判定
@@ -55,17 +75,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     checkInitialAuthStatus();
-  }, []);
+    if (isAuthenticated) {
+      checkAdminStatus();
+    }
+  }, [isAuthenticated]);
 
   return (
-    <AuthContext.Provider value={{ 
-      isAuthenticated, 
-      setIsAuthenticated, 
-      checkAuthStatus, 
-      refreshAuthStatus: checkInitialAuthStatus,
-      login,
-      logout
-    }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        setIsAuthenticated,
+        checkAuthStatus,
+        refreshAuthStatus: checkInitialAuthStatus,
+        login,
+        logout,
+        isAdmin,
+        checkAdminStatus,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

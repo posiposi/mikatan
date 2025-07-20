@@ -6,7 +6,7 @@ import LogoutConfirmDialog from "./LogoutConfirmDialog";
 import { post } from "../utils/api";
 
 export default function Navigation() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, isAdmin } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -64,14 +64,23 @@ export default function Navigation() {
             </>
           )}
           {isAuthenticated && (
-            <Button
-              colorScheme="blue"
-              variant="outline"
-              size="sm"
-              onClick={() => setIsDialogOpen(true)}
-            >
-              ログアウト
-            </Button>
+            <>
+              {isAdmin && (
+                <Link to="/admin">
+                  <Button colorScheme="blue" variant="outline" size="sm">
+                    管理画面
+                  </Button>
+                </Link>
+              )}
+              <Button
+                colorScheme="blue"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsDialogOpen(true)}
+              >
+                ログアウト
+              </Button>
+            </>
           )}
         </Flex>
       </Flex>
