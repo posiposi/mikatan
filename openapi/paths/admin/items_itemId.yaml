@@ -1,0 +1,185 @@
+get:
+  summary: 管理者用アイテム詳細取得
+  description: 管理者権限で指定されたIDのアイテム詳細を取得します
+  operationId: getAdminSingleItemById
+  tags:
+    - admin-items
+  security:
+    - bearerAuth: []
+    - cookieAuth: []
+  parameters:
+    - name: item_id
+      in: path
+      required: true
+      description: アイテムID
+      schema:
+        type: string
+        example: "clm0abc123def456"
+  responses:
+    '200':
+      description: アイテム詳細取得成功
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/item/item.yaml"
+    '400':
+      description: 不正なリクエスト
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "ID is required"
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "認証が必要です"
+    '403':
+      description: 管理者権限エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "管理者権限が必要です"
+    '404':
+      $ref: "../../components/responses/item/404NotFoundItem.yaml"
+
+put:
+  summary: 管理者用アイテム更新
+  description: 管理者権限で指定されたIDのアイテムを更新します
+  operationId: updateAdminItemById
+  tags:
+    - admin-items
+  security:
+    - bearerAuth: []
+    - cookieAuth: []
+  parameters:
+    - name: item_id
+      in: path
+      required: true
+      description: アイテムID
+      schema:
+        type: string
+        example: "clm0abc123def456"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - item_name
+          properties:
+            item_name:
+              type: string
+              description: アイテム名
+              example: "更新されたアイテム名"
+            stock:
+              type: boolean
+              description: 在庫状況
+              example: false
+            description:
+              type: string
+              description: アイテム説明
+              example: "管理者により更新されたアイテム説明"
+  responses:
+    '200':
+      description: アイテム更新成功
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas/item/item.yaml"
+    '400':
+      $ref: "../../components/responses/common/400BadRequest.yaml"
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "認証が必要です"
+    '403':
+      description: 管理者権限エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "管理者権限が必要です"
+    '500':
+      description: サーバーエラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "内部サーバーエラーが発生しました"
+
+delete:
+  summary: 管理者用アイテム削除
+  description: 管理者権限で指定されたIDのアイテムを削除します
+  operationId: deleteAdminItemById
+  tags:
+    - admin-items
+  security:
+    - bearerAuth: []
+    - cookieAuth: []
+  parameters:
+    - name: item_id
+      in: path
+      required: true
+      description: アイテムID
+      schema:
+        type: string
+        example: "clm0abc123def456"
+  responses:
+    '204':
+      description: アイテム削除成功
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "認証が必要です"
+    '403':
+      description: 管理者権限エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "管理者権限が必要です"
+    '500':
+      description: サーバーエラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "内部サーバーエラーが発生しました"
