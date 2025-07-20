@@ -53,8 +53,8 @@ func seedTestData(db *gorm.DB) error {
 	userId1 := "f47ac10b-58cc-4372-a567-0e02b2c3d111"
 	userId2 := "f47ac10b-58cc-4372-a567-0e02b2c3d112"
 	users := []model.User{
-		{UserId: userId1, Name: "User1", Email: "user1@example.com", Password: "password"},
-		{UserId: userId2, Name: "User2", Email: "user2@example.com", Password: "password"},
+		{Id: userId1, Name: "User1", Email: "user1@example.com", Password: "password", Role: "USER", IsAdmin: false},
+		{Id: userId2, Name: "User2", Email: "user2@example.com", Password: "password", Role: "USER", IsAdmin: false},
 	}
 	items := []model.Item{
 		{ItemId: "f47ac10b-58cc-4372-a567-0e02b2c3d110", UserId: userId1, ItemName: "Item1", Stock: true, Description: "Description1"},
@@ -104,7 +104,7 @@ func TestGetAllItems_SortedByItemId(t *testing.T) {
 		defer tx.Rollback()
 
 		userId := "f47ac10b-58cc-4372-a567-0e02b2c3d115"
-		user := model.User{UserId: userId, Name: "TestUser", Email: "test1@example.com", Password: "password"}
+		user := model.User{Id: userId, Name: "TestUser", Email: "test1@example.com", Password: "password", Role: "USER", IsAdmin: false}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
@@ -137,7 +137,7 @@ func TestCreateItem(t *testing.T) {
 		defer tx.Rollback()
 
 		userId := uuid.New().String()
-		user := model.User{UserId: userId, Name: "TestUser", Email: "test250@example.com", Password: "password"}
+		user := model.User{Id: userId, Name: "TestUser", Email: "test250@example.com", Password: "password", Role: "USER", IsAdmin: false}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
@@ -178,7 +178,7 @@ func TestCreateItem(t *testing.T) {
 		defer tx.Rollback()
 
 		userId := uuid.New().String()
-		user := model.User{UserId: userId, Name: "TestUser", Email: "test3@example.com", Password: "password"}
+		user := model.User{Id: userId, Name: "TestUser", Email: "test3@example.com", Password: "password", Role: "USER", IsAdmin: false}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
@@ -221,7 +221,7 @@ func TestGetItemByID(t *testing.T) {
 		defer tx.Rollback()
 
 		userId := "f47ac10b-58cc-4372-a567-0e02b2c3d400"
-		user := model.User{UserId: userId, Name: "TestUser", Email: "test400@example.com", Password: "password"}
+		user := model.User{Id: userId, Name: "TestUser", Email: "test400@example.com", Password: "password", Role: "USER", IsAdmin: false}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
@@ -271,7 +271,7 @@ func TestUpdateItem(t *testing.T) {
 		defer tx.Rollback()
 
 		userId := "f47ac10b-58cc-4372-a567-0e02b2c3d500"
-		user := model.User{UserId: userId, Name: "TestUser", Email: "test500@example.com", Password: "password"}
+		user := model.User{Id: userId, Name: "TestUser", Email: "test500@example.com", Password: "password", Role: "USER", IsAdmin: false}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}
@@ -348,7 +348,7 @@ func TestDeleteItem(t *testing.T) {
 		defer tx.Rollback()
 
 		userId := uuid.New().String()
-		user := model.User{UserId: userId, Name: "TestUser", Email: "test600@example.com", Password: "password"}
+		user := model.User{Id: userId, Name: "TestUser", Email: "test600@example.com", Password: "password", Role: "USER", IsAdmin: false}
 		if err := tx.Create(&user).Error; err != nil {
 			t.Fatal(err)
 		}

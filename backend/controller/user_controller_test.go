@@ -6,7 +6,8 @@ import (
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"github.com/posiposi/project/backend/model"
+	"github.com/posiposi/project/backend/domain"
+	"github.com/posiposi/project/backend/usecase/request"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -15,14 +16,20 @@ type MockUserUsecase struct {
 	mock.Mock
 }
 
-func (m *MockUserUsecase) SignUp(user model.User) (model.UserResponse, error) {
-	args := m.Called(user)
-	return args.Get(0).(model.UserResponse), args.Error(1)
+func (m *MockUserUsecase) SignUp(req request.SignUpRequest) (*domain.User, error) {
+	args := m.Called(req)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.User), args.Error(1)
 }
 
-func (m *MockUserUsecase) Login(user model.User) (string, error) {
-	args := m.Called(user)
-	return args.String(0), args.Error(1)
+func (m *MockUserUsecase) Login(req request.LogInRequest) (string, *domain.User, error) {
+	args := m.Called(req)
+	if args.Get(1) == nil {
+		return args.String(0), nil, args.Error(2)
+	}
+	return args.String(0), args.Get(1).(*domain.User), args.Error(2)
 }
 
 func TestCheckAuth_Success(t *testing.T) {

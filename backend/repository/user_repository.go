@@ -1,14 +1,14 @@
 package repository
 
 import (
-	"github.com/posiposi/project/backend/model"
 	"github.com/posiposi/project/backend/domain"
+	ormModel "github.com/posiposi/project/backend/internal/orm/model"
 	"gorm.io/gorm"
 )
 
 type IUserRepository interface {
-	GetUserByEmail(user *model.User, email string) error
-	CreateUser(user *model.User) error
+	GetUserByEmail(user *ormModel.User, email string) error
+	CreateUser(user *ormModel.User) error
 	GetUserByID(userID string) (*domain.User, error)
 }
 
@@ -20,14 +20,14 @@ func NewUserRepository(db *gorm.DB) IUserRepository {
 	return &userRepository{db}
 }
 
-func (ur *userRepository) GetUserByEmail(user *model.User, email string) error {
+func (ur *userRepository) GetUserByEmail(user *ormModel.User, email string) error {
 	if err := ur.db.Where("email = ?", email).First(&user).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (ur *userRepository) CreateUser(user *model.User) error {
+func (ur *userRepository) CreateUser(user *ormModel.User) error {
 	if err := ur.db.Create(user).Error; err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (ur *userRepository) CreateUser(user *model.User) error {
 }
 
 func (ur *userRepository) GetUserByID(userID string) (*domain.User, error) {
-	var user model.User
+	var user ormModel.User
 	if err := ur.db.Where("user_id = ?", userID).First(&user).Error; err != nil {
 		return nil, err
 	}

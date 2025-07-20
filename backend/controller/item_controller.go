@@ -40,26 +40,26 @@ func (ic *itemController) CreateItem(c echo.Context) error {
 		Stock       bool   `json:"stock"`
 		Description string `json:"description"`
 	}
-	
+
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	if err := c.Validate(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	
+
 	userId, ok := c.Get("user_id").(string)
 	if !ok || userId == "" {
 		return c.JSON(http.StatusUnauthorized, "user_id not found in context")
 	}
-	
+
 	createReq := request.CreateItemRequest{
 		ItemName:    req.ItemName,
 		Stock:       req.Stock,
 		Description: req.Description,
 		UserId:      userId,
 	}
-	
+
 	createdItem, err := ic.iu.CreateItem(createReq)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
