@@ -1,12 +1,6 @@
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
-import {
-  Box,
-  Flex,
-  VStack,
-  Text,
-  Container,
-} from "@chakra-ui/react";
+import { Box, Flex, VStack, Text, Container } from "@chakra-ui/react";
 import { FiHome, FiList, FiPlus } from "react-icons/fi";
 import { useAuth } from "../../hooks/useAuth";
 import { useColorModeValue } from "../hooks/color-mode-hooks";
@@ -74,8 +68,6 @@ const SidebarContent: React.FC<SidebarProps> = ({ onClose }) => {
 
 const AdminDashboard: React.FC = () => {
   const { isAdmin } = useAuth();
-  const bgColor = useColorModeValue("gray.100", "gray.900");
-
   if (!isAdmin) {
     return (
       <Container centerContent>
@@ -90,7 +82,7 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <Box minH="100vh" bg={bgColor}>
+    <Box minH="100vh">
       <SidebarContent />
       <Box ml={{ base: 0, md: 60 }} p="4">
         <Box p="4">
