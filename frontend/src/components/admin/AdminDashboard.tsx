@@ -1,62 +1,100 @@
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
+import {
+  Box,
+  Flex,
+  VStack,
+  Text,
+  Container,
+} from "@chakra-ui/react";
+import { FiHome, FiList, FiPlus } from "react-icons/fi";
 import { useAuth } from "../../hooks/useAuth";
+import { useColorModeValue } from "../hooks/color-mode-hooks";
+
+interface SidebarProps {
+  onClose?: () => void;
+}
+
+const SidebarContent: React.FC<SidebarProps> = ({ onClose }) => {
+  const bg = useColorModeValue("gray.50", "gray.900");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+  const hoverBg = useColorModeValue("cyan.400", "cyan.600");
+
+  const menuItems = [
+    { to: "/admin", label: "ダッシュボード", icon: FiHome },
+    { to: "/admin/items", label: "商品一覧", icon: FiList },
+    { to: "/admin/items/new", label: "商品登録", icon: FiPlus },
+  ];
+
+  return (
+    <Box
+      bg={bg}
+      borderRight="1px"
+      borderRightColor={borderColor}
+      w={{ base: "full", md: 60 }}
+      pos="fixed"
+      h="full"
+    >
+      <Flex h="20" alignItems="center" mx="8">
+        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
+          管理画面
+        </Text>
+      </Flex>
+      <VStack align="stretch" gap={1} px="4">
+        {menuItems.map((item) => (
+          <Box key={item.to}>
+            <Link to={item.to} onClick={onClose}>
+              <Flex
+                align="center"
+                p="4"
+                mx="4"
+                borderRadius="lg"
+                role="group"
+                cursor="pointer"
+                _hover={{
+                  bg: hoverBg,
+                  color: "white",
+                }}
+              >
+                <Box mr="4">
+                  <item.icon size={16} />
+                </Box>
+                {item.label}
+              </Flex>
+            </Link>
+          </Box>
+        ))}
+      </VStack>
+    </Box>
+  );
+};
 
 const AdminDashboard: React.FC = () => {
   const { isAdmin } = useAuth();
+  const bgColor = useColorModeValue("gray.100", "gray.900");
 
   if (!isAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">
+      <Container centerContent>
+        <Box textAlign="center" py={10} px={6}>
+          <Text fontSize="2xl" fontWeight="bold" color="red.500" mb={4}>
             アクセス権限がありません
-          </h1>
-          <p className="text-gray-600">管理者権限が必要です。</p>
-        </div>
-      </div>
+          </Text>
+          <Text color="gray.500">管理者権限が必要です。</Text>
+        </Box>
+      </Container>
     );
   }
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="w-64 bg-gray-800 text-white">
-        <div className="p-6">
-          <h2 className="text-xl font-bold mb-6">管理画面</h2>
-          <nav>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  to="/admin"
-                  className="block p-3 rounded hover:bg-gray-700 transition-colors"
-                >
-                  ダッシュボード
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/admin/items"
-                  className="block p-3 rounded hover:bg-gray-700 transition-colors"
-                >
-                  商品一覧
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/admin/items/new"
-                  className="block p-3 rounded hover:bg-gray-700 transition-colors"
-                >
-                  商品登録
-                </Link>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </aside>
-      <main className="flex-1 p-6">
-        <Outlet />
-      </main>
-    </div>
+    <Box minH="100vh" bg={bgColor}>
+      <SidebarContent />
+      <Box ml={{ base: 0, md: 60 }} p="4">
+        <Box p="4">
+          <Outlet />
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
