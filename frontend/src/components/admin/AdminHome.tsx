@@ -1,35 +1,53 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Box, Heading, Grid, Text, Button, VStack } from "@chakra-ui/react";
+import { useColorModeValue } from "../hooks/color-mode-hooks";
 
 const AdminHome: React.FC = () => {
+  const cardBg = useColorModeValue("white", "gray.800");
+  const textColor = useColorModeValue("gray.600", "gray.300");
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">管理画面ホーム</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">商品管理</h2>
-          <p className="text-gray-600 mb-4">
-            商品の一覧表示、編集、削除ができます。
-          </p>
-          <Link
-            to="/admin/items"
-            className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-          >
-            商品一覧を見る
-          </Link>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">新規商品登録</h2>
-          <p className="text-gray-600 mb-4">新しい商品を登録できます。</p>
-          <Link
-            to="/admin/items/new"
-            className="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
-          >
-            商品を登録する
-          </Link>
-        </div>
-      </div>
-    </div>
+    <Box minH="100vh" py={8}>
+      <VStack gap={8} w="full" align="center" maxW="6xl" mx="auto" px={4}>
+        <Heading as="h1" size="2xl" textAlign="center">
+          管理画面ホーム
+        </Heading>
+        <Grid
+          templateColumns={{ base: "1fr", md: "1fr 1fr" }}
+          gap={6}
+          w="full"
+          maxW="4xl"
+        >
+          <Box bg={cardBg} p={6} borderRadius="lg" shadow="md">
+            <Heading as="h2" size="lg" mb={4}>
+              商品管理
+            </Heading>
+            <Text color={textColor} mb={4}>
+              商品の一覧表示、編集、削除ができます。
+            </Text>
+            <Link to="/admin/items">
+              <Button colorScheme="blue" size="md">
+                商品一覧を見る
+              </Button>
+            </Link>
+          </Box>
+          <Box bg={cardBg} p={6} borderRadius="lg" shadow="md">
+            <Heading as="h2" size="lg" mb={4}>
+              新規商品登録
+            </Heading>
+            <Text color={textColor} mb={4}>
+              新しい商品を登録できます。
+            </Text>
+            <Link to="/admin/items/new">
+              <Button colorScheme="green" size="md">
+                商品を登録する
+              </Button>
+            </Link>
+          </Box>
+        </Grid>
+      </VStack>
+    </Box>
   );
 };
 
