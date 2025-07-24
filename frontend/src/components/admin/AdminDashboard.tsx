@@ -33,7 +33,10 @@ const SidebarContent: React.FC<SidebarProps> = ({ onClose }) => {
       borderRightColor={borderColor}
       w={{ base: "full", md: 60 }}
       pos="fixed"
-      h="full"
+      top="0"
+      left="0"
+      h="100vh"
+      zIndex="1000"
     >
       <Flex h="20" alignItems="center" mx="8">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
