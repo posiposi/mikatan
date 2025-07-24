@@ -9,10 +9,10 @@ export const apiRequest = async (
   options: ApiOptions = {}
 ): Promise<Response> => {
   const { requiresAuth = false, headers = {}, ...restOptions } = options;
-  
+
   const requestHeaders: Record<string, string> = {
     "Content-Type": "application/json",
-    ...headers as Record<string, string>,
+    ...(headers as Record<string, string>),
   };
 
   if (requiresAuth) {
@@ -25,13 +25,16 @@ export const apiRequest = async (
   const response = await fetch(`${baseURL}${endpoint}`, {
     ...restOptions,
     headers: requestHeaders,
-    credentials: 'include',
+    credentials: "include",
   });
 
   return response;
 };
 
-export const get = async (endpoint: string, requiresAuth: boolean = false): Promise<Response> => {
+export const get = async (
+  endpoint: string,
+  requiresAuth: boolean = false
+): Promise<Response> => {
   return apiRequest(endpoint, { method: "GET", requiresAuth });
 };
 
@@ -59,6 +62,9 @@ export const put = async (
   });
 };
 
-export const del = async (endpoint: string, requiresAuth: boolean = false): Promise<Response> => {
+export const del = async (
+  endpoint: string,
+  requiresAuth: boolean = false
+): Promise<Response> => {
   return apiRequest(endpoint, { method: "DELETE", requiresAuth });
 };

@@ -25,6 +25,7 @@ func main() {
 	userController := controller.NewUserController(userUsecase)
 	itemController := controller.NewItemController(itemUsecase)
 	adminItemController := controller.NewAdminItemController(itemUsecase)
-	e := router.NewRouter(userController, itemController, adminItemController, userRepository)
+	adminAuthController := controller.NewAdminAuthController()
+	e := router.NewRouter(userController, itemController, adminItemController, adminAuthController, userRepository)
 	e.Logger.Fatal(e.StartTLS(":8080", "/go/src/localhost+2.pem", "/go/src/localhost+2-key.pem"))
 }

@@ -1,0 +1,43 @@
+get:
+  summary: 管理者権限確認
+  description: 現在のユーザーが管理者権限を持っているかを確認します
+  operationId: checkAdminAuth
+  tags:
+    - admin-auth
+  security:
+    - bearerAuth: []
+    - cookieAuth: []
+  responses:
+    '200':
+      description: 管理者権限確認成功
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Admin access granted"
+              admin:
+                type: boolean
+                example: true
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "認証が必要です"
+    '403':
+      description: 管理者権限エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "管理者権限が必要です"
