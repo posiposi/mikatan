@@ -170,7 +170,9 @@ const AdminItemList: React.FC = () => {
                   onClick={() => handleRowClick(item)}
                 >
                   <Table.Cell>
-                    <Text fontWeight="medium">{item.item_name}</Text>
+                    <Text fontWeight="medium" color="gray.500">
+                      {item.item_name}
+                    </Text>
                   </Table.Cell>
                   <Table.Cell>
                     <Badge
@@ -181,7 +183,7 @@ const AdminItemList: React.FC = () => {
                     </Badge>
                   </Table.Cell>
                   <Table.Cell>
-                    <Text lineClamp={1} maxW="xs">
+                    <Text lineClamp={1} maxW="xs" color="gray.500">
                       {item.description}
                     </Text>
                   </Table.Cell>
@@ -233,7 +235,15 @@ const AdminItemList: React.FC = () => {
             >
               <HStack>
                 <PaginationPrevTrigger />
-                <PaginationItems />
+                <PaginationItems
+                  render={(page) => (
+                    <Button
+                      variant={page.value === currentPage ? "solid" : "ghost"}
+                    >
+                      {page.value}
+                    </Button>
+                  )}
+                />
                 <PaginationNextTrigger />
               </HStack>
             </PaginationRoot>
