@@ -8,6 +8,7 @@ import AdminDashboard from "./components/admin/AdminDashboard";
 import AdminHome from "./components/admin/AdminHome";
 import AdminItemList from "./components/admin/AdminItemList";
 import AdminItemForm from "./components/admin/AdminItemForm";
+import AdminItemDetail from "./components/admin/AdminItemDetail";
 import { AuthProvider } from "./contexts/AuthContext";
 
 const router = createBrowserRouter([
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
       {
         path: "items/new",
         element: <AdminItemForm mode="create" />,
+      },
+      {
+        path: "items/:id",
+        element: <AdminItemDetail />,
       },
       {
         path: "items/:id/edit",

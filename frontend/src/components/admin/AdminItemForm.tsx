@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { post, put, get } from "../../utils/api";
+import {
+  Input,
+  Textarea,
+  Button,
+  Box,
+  Heading,
+  Flex,
+  Spinner,
+  Stack,
+} from "@chakra-ui/react";
+import { Field } from "../ui/field";
+import { Checkbox } from "../ui/checkbox";
 
 interface ItemFormData {
   item_name: string;
@@ -10,11 +22,20 @@ interface ItemFormData {
 
 interface AdminItemFormProps {
   mode: "create" | "edit";
+  itemId?: string;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
-const AdminItemForm: React.FC<AdminItemFormProps> = ({ mode }) => {
+const AdminItemForm: React.FC<AdminItemFormProps> = ({
+  mode,
+  itemId,
+  onSuccess,
+  onCancel,
+}) => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const effectiveId = itemId || id;
 
   const [formData, setFormData] = useState<ItemFormData>({
     item_name: "",
@@ -50,10 +71,10 @@ const AdminItemForm: React.FC<AdminItemFormProps> = ({ mode }) => {
   };
 
   useEffect(() => {
-    if (mode === "edit" && id) {
-      fetchItem(id);
+    if (mode === "edit" && effectiveId) {
+      fetchItem(effectiveId);
     }
-  }, [mode, id]);
+  }, [mode, effectiveId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,11 +93,15 @@ const AdminItemForm: React.FC<AdminItemFormProps> = ({ mode }) => {
       if (mode === "create") {
         response = await post("/v1/admin/items", formData, true);
       } else {
-        response = await put(`/v1/admin/items/${id}`, formData, true);
+        response = await put(`/v1/admin/items/${effectiveId}`, formData, true);
       }
 
       if (response.ok) {
-        navigate("/admin/items");
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          navigate("/admin/items");
+        }
       } else {
         const errorData = await response.text();
         setError(
@@ -112,97 +137,90 @@ const AdminItemForm: React.FC<AdminItemFormProps> = ({ mode }) => {
 
   if (loadingData) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg">データを読み込み中...</div>
-      </div>
+      <Flex justify="center" align="center" h="64">
+        <Spinner size="xl" />
+      </Flex>
     );
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">
-        {mode === "create" ? "商品登録" : "商品編集"}
-      </h1>
+    <Box>
+      {!onCancel && (
+        <Heading size="lg" mb={6}>
+          {mode === "create" ? "商品登録" : "商品編集"}
+        </Heading>
+      )}
 
-      <div className="bg-white shadow rounded-lg p-6">
+      <Box
+        bg={onCancel ? "transparent" : "white"}
+        shadow={onCancel ? "none" : "md"}
+        borderRadius="lg"
+        p={onCancel ? 0 : 6}
+      >
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <Box bg="red.50" color="red.600" p={3} borderRadius="md" mb={4}>
             {error}
-          </div>
+          </Box>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label
-              htmlFor="item_name"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              商品名 *
-            </label>
-            <input
-              type="text"
-              id="item_name"
-              name="item_name"
-              value={formData.item_name}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="商品名を入力してください"
-            />
-          </div>
+        <form onSubmit={handleSubmit}>
+          <Stack gap={6}>
+            <Field label="商品名" required>
+              <Input
+                name="item_name"
+                value={formData.item_name}
+                onChange={handleChange}
+                placeholder="商品名を入力してください"
+              />
+            </Field>
 
-          <div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
+            <Box>
+              <Checkbox
                 name="stock"
                 checked={formData.stock}
-                onChange={handleChange}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="ml-2 text-sm font-medium text-gray-700">
+                onCheckedChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    stock: e.checked as boolean,
+                  }));
+                }}
+              >
                 在庫あり
-              </span>
-            </label>
-          </div>
+              </Checkbox>
+            </Box>
 
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              商品説明
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="商品の説明を入力してください"
-            />
-          </div>
+            <Field label="商品説明">
+              <Textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="商品の説明を入力してください"
+                rows={4}
+              />
+            </Field>
 
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
-            >
-              {loading ? "処理中..." : mode === "create" ? "登録" : "更新"}
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate("/admin/items")}
-              className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400 transition-colors"
-            >
-              キャンセル
-            </button>
-          </div>
+            <Flex gap={4}>
+              <Button type="submit" colorScheme="blue" loading={loading}>
+                {mode === "create" ? "登録" : "更新"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  if (onCancel) {
+                    onCancel();
+                  } else {
+                    navigate("/admin/items");
+                  }
+                }}
+              >
+                キャンセル
+              </Button>
+            </Flex>
+          </Stack>
         </form>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
