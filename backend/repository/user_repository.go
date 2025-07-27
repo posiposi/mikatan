@@ -71,7 +71,7 @@ func (ur *userRepository) CreateUser(user *domain.User) error {
 
 func (ur *userRepository) GetUserById(userId *domain.UserId) (*domain.User, error) {
 	var user ormModel.User
-	if err := ur.db.Where("id = ?", userId.Value()).First(&user).Error; err != nil {
+	if err := ur.db.Where("user_id = ?", userId.Value()).First(&user).Error; err != nil {
 		return nil, err
 	}
 

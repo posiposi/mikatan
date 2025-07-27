@@ -46,7 +46,9 @@ export default function SignupPage() {
           alert("会員登録が完了しました。自動的にログインしています。");
           navigate("/");
         } else {
-          alert("会員登録は完了しましたが、ログインに失敗しました。手動でログインしてください。");
+          alert(
+            "会員登録は完了しましたが、ログインに失敗しました。手動でログインしてください。"
+          );
           navigate("/login");
         }
       } else {

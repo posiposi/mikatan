@@ -1,6 +1,4 @@
-import {
-  Button,
-} from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 import {
   DialogActionTrigger,
   DialogBody,
@@ -29,9 +27,7 @@ export default function LogoutConfirmDialog({
         <DialogHeader>
           <DialogTitle>ログアウト確認</DialogTitle>
         </DialogHeader>
-        <DialogBody>
-          本当にログアウトしますか？
-        </DialogBody>
+        <DialogBody>本当にログアウトしますか？</DialogBody>
         <DialogFooter>
           <DialogActionTrigger asChild>
             <Button variant="outline" onClick={onClose}>
