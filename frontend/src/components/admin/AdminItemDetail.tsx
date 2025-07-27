@@ -30,9 +30,10 @@ interface Item {
 
 interface AdminItemDetailProps {
   itemId?: string;
+  onClose?: () => void;
 }
 
-const AdminItemDetail: React.FC<AdminItemDetailProps> = ({ itemId }) => {
+const AdminItemDetail: React.FC<AdminItemDetailProps> = ({ itemId, onClose }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [item, setItem] = useState<Item | null>(null);
@@ -85,7 +86,16 @@ const AdminItemDetail: React.FC<AdminItemDetailProps> = ({ itemId }) => {
     <Box>
       <Flex justify="space-between" align="center" mb={6}>
         <HStack gap={4}>
-          <Button variant="ghost" onClick={() => navigate("/admin/items")}>
+          <Button 
+            variant="ghost" 
+            onClick={() => {
+              if (onClose) {
+                onClose();
+              } else {
+                navigate("/admin/items");
+              }
+            }}
+          >
             <FiArrowLeft /> 戻る
           </Button>
           <Heading size="lg">商品詳細</Heading>

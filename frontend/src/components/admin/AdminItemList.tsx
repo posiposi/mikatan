@@ -260,7 +260,12 @@ const AdminItemList: React.FC = () => {
           </DialogHeader>
           <DialogCloseTrigger />
           <DialogBody>
-            {selectedItem && <AdminItemDetail itemId={selectedItem.item_id} />}
+            {selectedItem && (
+              <AdminItemDetail 
+                itemId={selectedItem.item_id} 
+                onClose={() => setIsDetailModalOpen(false)}
+              />
+            )}
           </DialogBody>
         </DialogContent>
       </DialogRoot>
