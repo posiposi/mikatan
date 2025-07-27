@@ -107,7 +107,6 @@ const AdminItemList: React.FC = () => {
     setIsDetailModalOpen(true);
   };
 
-  // ページネーション計算
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
@@ -224,7 +223,6 @@ const AdminItemList: React.FC = () => {
           )}
         </Box>
 
-        {/* ページネーション */}
         {totalPages > 1 && (
           <Flex justify="center">
             <PaginationRoot
@@ -251,7 +249,6 @@ const AdminItemList: React.FC = () => {
         )}
       </VStack>
 
-      {/* 詳細モーダル */}
       <DialogRoot
         open={isDetailModalOpen}
         onOpenChange={(e) => setIsDetailModalOpen(e.open)}
@@ -268,7 +265,6 @@ const AdminItemList: React.FC = () => {
         </DialogContent>
       </DialogRoot>
 
-      {/* 編集モーダル */}
       <DialogRoot
         open={isEditModalOpen}
         onOpenChange={(e) => setIsEditModalOpen(e.open)}
@@ -295,7 +291,6 @@ const AdminItemList: React.FC = () => {
         </DialogContent>
       </DialogRoot>
 
-      {/* 削除確認ダイアログ */}
       <DialogRoot
         open={isDeleteAlertOpen}
         onOpenChange={(e) => setIsDeleteAlertOpen(e.open)}
