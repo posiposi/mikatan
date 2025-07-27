@@ -31,9 +31,10 @@ interface Item {
 interface AdminItemDetailProps {
   itemId?: string;
   onClose?: () => void;
+  onEdit?: (item: Item) => void;
 }
 
-const AdminItemDetail: React.FC<AdminItemDetailProps> = ({ itemId, onClose }) => {
+const AdminItemDetail: React.FC<AdminItemDetailProps> = ({ itemId, onClose, onEdit }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [item, setItem] = useState<Item | null>(null);
@@ -102,7 +103,14 @@ const AdminItemDetail: React.FC<AdminItemDetailProps> = ({ itemId, onClose }) =>
         </HStack>
         <Button
           colorScheme="blue"
-          onClick={() => navigate(`/admin/items/${id}/edit`)}
+          onClick={() => {
+            if (onEdit && item) {
+              onEdit(item);
+            } else {
+              const effectiveId = itemId || id;
+              navigate(`/admin/items/${effectiveId}/edit`);
+            }
+          }}
         >
           <FiEdit /> 編集
         </Button>

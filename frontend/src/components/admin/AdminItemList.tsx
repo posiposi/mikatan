@@ -264,6 +264,11 @@ const AdminItemList: React.FC = () => {
               <AdminItemDetail 
                 itemId={selectedItem.item_id} 
                 onClose={() => setIsDetailModalOpen(false)}
+                onEdit={(item) => {
+                  setSelectedItem(item);
+                  setIsDetailModalOpen(false);
+                  setIsEditModalOpen(true);
+                }}
               />
             )}
           </DialogBody>
