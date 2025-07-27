@@ -4,7 +4,6 @@ import { get, del } from "../../utils/api";
 import {
   Table,
   Badge,
-  Image,
   Box,
   Flex,
   Heading,
@@ -12,6 +11,11 @@ import {
   Text,
   HStack,
   IconButton,
+  VStack,
+  PaginationItems,
+  PaginationNextTrigger,
+  PaginationPrevTrigger,
+  PaginationRoot,
 } from "@chakra-ui/react";
 import { Button } from "../ui/button";
 import {
@@ -26,6 +30,7 @@ import {
 } from "../ui/dialog";
 import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 import AdminItemForm from "./AdminItemForm";
+import AdminItemDetail from "./AdminItemDetail";
 
 interface Item {
   item_id: string;
@@ -44,9 +49,12 @@ const AdminItemList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const fetchItems = async () => {
     try {
@@ -95,8 +103,15 @@ const AdminItemList: React.FC = () => {
   };
 
   const handleRowClick = (item: Item) => {
-    navigate(`/admin/items/${item.item_id}`);
+    setSelectedItem(item);
+    setIsDetailModalOpen(true);
   };
+
+  // ページネーション計算
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(items.length / itemsPerPage);
 
   useEffect(() => {
     fetchItems();
@@ -130,94 +145,118 @@ const AdminItemList: React.FC = () => {
         </Button>
       </Flex>
 
-      <Box bg="bleck" shadow="md" borderRadius="lg" overflow="hidden">
-        <Table.Root
-          variant="outline"
-          css={{
-            "& thead tr": {
-              backgroundColor: "var(--chakra-colors-gray-50)",
-            },
-          }}
-        >
-          <Table.Header>
-            <Table.Row>
-              <Table.ColumnHeader>画像</Table.ColumnHeader>
-              <Table.ColumnHeader>商品名</Table.ColumnHeader>
-              <Table.ColumnHeader>在庫状況</Table.ColumnHeader>
-              <Table.ColumnHeader>説明</Table.ColumnHeader>
-              <Table.ColumnHeader>作成日</Table.ColumnHeader>
-              <Table.ColumnHeader>操作</Table.ColumnHeader>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {items.map((item) => (
-              <Table.Row
-                key={item.item_id}
-                _hover={{ bg: "gray.50", cursor: "pointer" }}
-                onClick={() => handleRowClick(item)}
-              >
-                <Table.Cell onClick={(e) => e.stopPropagation()}>
-                  <Image
-                    src={item.image_url || "https://via.placeholder.com/50"}
-                    alt={item.item_name}
-                    width="50px"
-                    height="50px"
-                    objectFit="cover"
-                    borderRadius="md"
-                  />
-                </Table.Cell>
-                <Table.Cell>
-                  <Text fontWeight="medium">{item.item_name}</Text>
-                </Table.Cell>
-                <Table.Cell>
-                  <Badge
-                    colorScheme={item.stock ? "green" : "red"}
-                    variant="subtle"
-                  >
-                    {item.stock ? "在庫あり" : "在庫なし"}
-                  </Badge>
-                </Table.Cell>
-                <Table.Cell>
-                  <Text lineClamp={1} maxW="xs">
-                    {item.description}
-                  </Text>
-                </Table.Cell>
-                <Table.Cell>
-                  <Text fontSize="sm" color="gray.500">
-                    {new Date(item.created_at).toLocaleDateString("ja-JP")}
-                  </Text>
-                </Table.Cell>
-                <Table.Cell onClick={(e) => e.stopPropagation()}>
-                  <HStack gap={2}>
-                    <IconButton
-                      aria-label="編集"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleEdit(item)}
+      <VStack gap={6} align="stretch">
+        <Box bg="gray.800" shadow="md" borderRadius="lg" overflow="hidden">
+          <Table.Root
+            variant="outline"
+            size="sm"
+            css={{
+              "& thead tr": {
+                backgroundColor: "var(--chakra-colors-gray-50)",
+              },
+            }}
+          >
+            <Table.Body>
+              {currentItems.map((item) => (
+                <Table.Row
+                  key={item.item_id}
+                  _hover={{
+                    bg: "gray.50",
+                    cursor: "pointer",
+                    transform: "translateY(-1px)",
+                    boxShadow: "sm",
+                  }}
+                  transition="all 0.2s"
+                  onClick={() => handleRowClick(item)}
+                >
+                  <Table.Cell>
+                    <Text fontWeight="medium">{item.item_name}</Text>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Badge
+                      colorScheme={item.stock ? "green" : "red"}
+                      variant="subtle"
                     >
-                      <FiEdit color="blue" />
-                    </IconButton>
-                    <IconButton
-                      aria-label="削除"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleDeleteClick(item.item_id)}
-                    >
-                      <FiTrash2 color="red" />
-                    </IconButton>
-                  </HStack>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table.Root>
+                      {item.stock ? "在庫あり" : "在庫なし"}
+                    </Badge>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Text lineClamp={1} maxW="xs">
+                      {item.description}
+                    </Text>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Text fontSize="sm" color="gray.500">
+                      {new Date(item.created_at).toLocaleDateString("ja-JP")}
+                    </Text>
+                  </Table.Cell>
+                  <Table.Cell onClick={(e) => e.stopPropagation()}>
+                    <HStack gap={2}>
+                      <IconButton
+                        aria-label="編集"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleEdit(item)}
+                      >
+                        <FiEdit color="blue" />
+                      </IconButton>
+                      <IconButton
+                        aria-label="削除"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDeleteClick(item.item_id)}
+                      >
+                        <FiTrash2 color="red" />
+                      </IconButton>
+                    </HStack>
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table.Root>
 
-        {items.length === 0 && (
-          <Box textAlign="center" py={8}>
-            <Text color="gray.500">商品が登録されていません</Text>
-          </Box>
+          {items.length === 0 && (
+            <Box textAlign="center" py={8}>
+              <Text color="gray.500">商品が登録されていません</Text>
+            </Box>
+          )}
+        </Box>
+
+        {/* ページネーション */}
+        {totalPages > 1 && (
+          <Flex justify="center">
+            <PaginationRoot
+              count={items.length}
+              pageSize={itemsPerPage}
+              page={currentPage}
+              onPageChange={(e) => setCurrentPage(e.page)}
+            >
+              <HStack>
+                <PaginationPrevTrigger />
+                <PaginationItems />
+                <PaginationNextTrigger />
+              </HStack>
+            </PaginationRoot>
+          </Flex>
         )}
-      </Box>
+      </VStack>
+
+      {/* 詳細モーダル */}
+      <DialogRoot
+        open={isDetailModalOpen}
+        onOpenChange={(e) => setIsDetailModalOpen(e.open)}
+        size="xl"
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>商品詳細</DialogTitle>
+          </DialogHeader>
+          <DialogCloseTrigger />
+          <DialogBody>
+            {selectedItem && <AdminItemDetail itemId={selectedItem.item_id} />}
+          </DialogBody>
+        </DialogContent>
+      </DialogRoot>
 
       {/* 編集モーダル */}
       <DialogRoot

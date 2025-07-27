@@ -28,7 +28,11 @@ interface Item {
   image_url?: string;
 }
 
-const AdminItemDetail: React.FC = () => {
+interface AdminItemDetailProps {
+  itemId?: string;
+}
+
+const AdminItemDetail: React.FC<AdminItemDetailProps> = ({ itemId }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [item, setItem] = useState<Item | null>(null);
@@ -37,11 +41,12 @@ const AdminItemDetail: React.FC = () => {
 
   useEffect(() => {
     const fetchItem = async () => {
-      if (!id) return;
+      const effectiveId = itemId || id;
+      if (!effectiveId) return;
 
       try {
         setLoading(true);
-        const response = await get(`/v1/admin/items/${id}`, true);
+        const response = await get(`/v1/admin/items/${effectiveId}`, true);
 
         if (response.ok) {
           const data = await response.json();
@@ -58,7 +63,7 @@ const AdminItemDetail: React.FC = () => {
     };
 
     fetchItem();
-  }, [id]);
+  }, [id, itemId]);
 
   if (loading) {
     return (
