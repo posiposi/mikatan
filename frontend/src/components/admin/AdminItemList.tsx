@@ -261,8 +261,8 @@ const AdminItemList: React.FC = () => {
           <DialogCloseTrigger />
           <DialogBody>
             {selectedItem && (
-              <AdminItemDetail 
-                itemId={selectedItem.item_id} 
+              <AdminItemDetail
+                itemId={selectedItem.item_id}
                 onClose={() => setIsDetailModalOpen(false)}
                 onEdit={(item) => {
                   setSelectedItem(item);

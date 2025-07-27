@@ -34,7 +34,11 @@ interface AdminItemDetailProps {
   onEdit?: (item: Item) => void;
 }
 
-const AdminItemDetail: React.FC<AdminItemDetailProps> = ({ itemId, onClose, onEdit }) => {
+const AdminItemDetail: React.FC<AdminItemDetailProps> = ({
+  itemId,
+  onClose,
+  onEdit,
+}) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [item, setItem] = useState<Item | null>(null);
@@ -87,8 +91,8 @@ const AdminItemDetail: React.FC<AdminItemDetailProps> = ({ itemId, onClose, onEd
     <Box>
       <Flex justify="space-between" align="center" mb={6}>
         <HStack gap={4}>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => {
               if (onClose) {
                 onClose();
