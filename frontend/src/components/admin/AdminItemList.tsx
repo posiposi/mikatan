@@ -1,6 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { get, del } from "../../utils/api";
+import {
+  Table,
+  Badge,
+  Image,
+  Box,
+  Flex,
+  Heading,
+  Spinner,
+  Text,
+  HStack,
+  IconButton,
+} from "@chakra-ui/react";
+import { Button } from "../ui/button";
+import {
+  DialogRoot,
+  DialogContent,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  DialogTitle,
+  DialogActionTrigger,
+  DialogCloseTrigger,
+} from "../ui/dialog";
+import { FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
+import AdminItemForm from "./AdminItemForm";
 
 interface Item {
   item_id: string;
@@ -9,12 +34,19 @@ interface Item {
   description: string;
   created_at: string;
   updated_at: string;
+  image_url?: string;
 }
 
 const AdminItemList: React.FC = () => {
+  const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
   const fetchItems = async () => {
     try {
@@ -35,16 +67,25 @@ const AdminItemList: React.FC = () => {
     }
   };
 
-  const handleDelete = async (itemId: string) => {
-    if (!confirm("この商品を削除しますか？")) {
-      return;
-    }
+  const handleEdit = (item: Item) => {
+    setSelectedItem(item);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (itemId: string) => {
+    setDeleteItemId(itemId);
+    setIsDeleteAlertOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteItemId) return;
 
     try {
-      const response = await del(`/v1/admin/items/${itemId}`, true);
+      const response = await del(`/v1/admin/items/${deleteItemId}`, true);
 
       if (response.ok) {
-        setItems(items.filter((item) => item.item_id !== itemId));
+        setItems(items.filter((item) => item.item_id !== deleteItemId));
+        setIsDeleteAlertOpen(false);
       } else {
         alert("削除に失敗しました");
       }
@@ -53,112 +94,182 @@ const AdminItemList: React.FC = () => {
     }
   };
 
+  const handleRowClick = (item: Item) => {
+    navigate(`/admin/items/${item.item_id}`);
+  };
+
   useEffect(() => {
     fetchItems();
   }, []);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg">読み込み中...</div>
-      </div>
+      <Flex justify="center" align="center" h="64">
+        <Spinner size="xl" />
+      </Flex>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <Box bg="red.50" color="red.600" p={3} borderRadius="md">
         {error}
-      </div>
+      </Box>
     );
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">商品一覧</h1>
-        <Link
-          to="/admin/items/new"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
+    <Box>
+      <Flex justify="space-between" align="center" mb={6}>
+        <Heading size="lg">商品一覧</Heading>
+        <Button
+          colorScheme="green"
+          onClick={() => navigate("/admin/items/new")}
         >
-          新規登録
-        </Link>
-      </div>
+          <FiPlus /> 新規登録
+        </Button>
+      </Flex>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                商品名
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                在庫状況
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                説明
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                作成日
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                操作
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+      <Box bg="bleck" shadow="md" borderRadius="lg" overflow="hidden">
+        <Table.Root
+          variant="outline"
+          css={{
+            "& thead tr": {
+              backgroundColor: "var(--chakra-colors-gray-50)",
+            },
+          }}
+        >
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeader>画像</Table.ColumnHeader>
+              <Table.ColumnHeader>商品名</Table.ColumnHeader>
+              <Table.ColumnHeader>在庫状況</Table.ColumnHeader>
+              <Table.ColumnHeader>説明</Table.ColumnHeader>
+              <Table.ColumnHeader>作成日</Table.ColumnHeader>
+              <Table.ColumnHeader>操作</Table.ColumnHeader>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
             {items.map((item) => (
-              <tr key={item.item_id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
-                    {item.item_name}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      item.stock
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
+              <Table.Row
+                key={item.item_id}
+                _hover={{ bg: "gray.50", cursor: "pointer" }}
+                onClick={() => handleRowClick(item)}
+              >
+                <Table.Cell onClick={(e) => e.stopPropagation()}>
+                  <Image
+                    src={item.image_url || "https://via.placeholder.com/50"}
+                    alt={item.item_name}
+                    width="50px"
+                    height="50px"
+                    objectFit="cover"
+                    borderRadius="md"
+                  />
+                </Table.Cell>
+                <Table.Cell>
+                  <Text fontWeight="medium">{item.item_name}</Text>
+                </Table.Cell>
+                <Table.Cell>
+                  <Badge
+                    colorScheme={item.stock ? "green" : "red"}
+                    variant="subtle"
                   >
                     {item.stock ? "在庫あり" : "在庫なし"}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-gray-900 max-w-xs truncate">
+                  </Badge>
+                </Table.Cell>
+                <Table.Cell>
+                  <Text lineClamp={1} maxW="xs">
                     {item.description}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(item.created_at).toLocaleDateString("ja-JP")}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <Link
-                    to={`/admin/items/${item.item_id}/edit`}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4"
-                  >
-                    編集
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(item.item_id)}
-                    className="text-red-600 hover:text-red-900"
-                  >
-                    削除
-                  </button>
-                </td>
-              </tr>
+                  </Text>
+                </Table.Cell>
+                <Table.Cell>
+                  <Text fontSize="sm" color="gray.500">
+                    {new Date(item.created_at).toLocaleDateString("ja-JP")}
+                  </Text>
+                </Table.Cell>
+                <Table.Cell onClick={(e) => e.stopPropagation()}>
+                  <HStack gap={2}>
+                    <IconButton
+                      aria-label="編集"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleEdit(item)}
+                    >
+                      <FiEdit color="blue" />
+                    </IconButton>
+                    <IconButton
+                      aria-label="削除"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDeleteClick(item.item_id)}
+                    >
+                      <FiTrash2 color="red" />
+                    </IconButton>
+                  </HStack>
+                </Table.Cell>
+              </Table.Row>
             ))}
-          </tbody>
-        </table>
+          </Table.Body>
+        </Table.Root>
 
         {items.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-gray-500">商品が登録されていません</p>
-          </div>
+          <Box textAlign="center" py={8}>
+            <Text color="gray.500">商品が登録されていません</Text>
+          </Box>
         )}
-      </div>
-    </div>
+      </Box>
+
+      {/* 編集モーダル */}
+      <DialogRoot
+        open={isEditModalOpen}
+        onOpenChange={(e) => setIsEditModalOpen(e.open)}
+        size="xl"
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>商品編集</DialogTitle>
+          </DialogHeader>
+          <DialogCloseTrigger />
+          <DialogBody pb={6}>
+            {selectedItem && (
+              <AdminItemForm
+                mode="edit"
+                itemId={selectedItem.item_id}
+                onSuccess={() => {
+                  setIsEditModalOpen(false);
+                  fetchItems();
+                }}
+                onCancel={() => setIsEditModalOpen(false)}
+              />
+            )}
+          </DialogBody>
+        </DialogContent>
+      </DialogRoot>
+
+      {/* 削除確認ダイアログ */}
+      <DialogRoot
+        open={isDeleteAlertOpen}
+        onOpenChange={(e) => setIsDeleteAlertOpen(e.open)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>商品の削除</DialogTitle>
+          </DialogHeader>
+          <DialogCloseTrigger />
+          <DialogBody>
+            この商品を削除してもよろしいですか？この操作は取り消せません。
+          </DialogBody>
+          <DialogFooter>
+            <DialogActionTrigger asChild>
+              <Button variant="outline">キャンセル</Button>
+            </DialogActionTrigger>
+            <Button colorScheme="red" onClick={handleDelete}>
+              削除
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogRoot>
+    </Box>
   );
 };
 
