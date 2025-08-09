@@ -12,8 +12,12 @@ type CreateItemRequest struct {
 }
 
 type UpdateItemRequest struct {
-	ItemId      string
-	ItemName    string
-	Stock       bool
-	Description string
+	ItemId          string
+	ItemName        string
+	Stock           bool
+	Description     string
+	PriceWithTax    *int
+	PriceWithoutTax *int
+	TaxRate         *float64
+	Currency        *string
 }

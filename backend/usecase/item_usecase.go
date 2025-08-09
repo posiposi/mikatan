@@ -181,7 +181,59 @@ func (iu *itemUsecase) UpdateItem(req request.UpdateItemRequest) (*domain.Item, 
 		return nil, err
 	}
 
-	return iu.ir.UpdateItem(updatedDomainItem)
+	updatedItem, err := iu.ir.UpdateItem(updatedDomainItem)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.PriceWithTax != nil && req.PriceWithoutTax != nil && req.TaxRate != nil && req.Currency != nil {
+		priceId, err := domain.NewPriceId(uuid.New().String())
+		if err != nil {
+			return nil, err
+		}
+
+		priceWithTax, err := domain.NewPriceWithTax(*req.PriceWithTax)
+		if err != nil {
+			return nil, err
+		}
+
+		priceWithoutTax, err := domain.NewPriceWithoutTax(*req.PriceWithoutTax)
+		if err != nil {
+			return nil, err
+		}
+
+		taxRate, err := domain.NewTaxRate(*req.TaxRate)
+		if err != nil {
+			return nil, err
+		}
+
+		currency, err := domain.NewCurrency(*req.Currency)
+		if err != nil {
+			return nil, err
+		}
+
+		startDate := time.Now()
+		price, err := domain.NewPrice(
+			priceId,
+			*itemId,
+			*priceWithTax,
+			*priceWithoutTax,
+			*taxRate,
+			*currency,
+			startDate,
+			nil,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		err = iu.pr.UpdateByItemId(context.Background(), req.ItemId, price)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return updatedItem, nil
 }
 
 func (iu *itemUsecase) DeleteItem(itemId string) error {

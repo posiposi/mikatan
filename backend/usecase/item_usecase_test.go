@@ -324,6 +324,110 @@ func TestUpdateItem_Success(t *testing.T) {
 	mockItemRepo.AssertExpectations(t)
 }
 
+func TestUpdateItem_WithPrice_Success(t *testing.T) {
+	mockItemRepo := new(MockItemRepository)
+	mockPriceRepo := new(MockPriceRepository)
+	uc := NewItemUsecase(mockItemRepo, mockPriceRepo)
+
+	oldPriceWithTax := 1100
+	oldPriceWithoutTax := 1000
+
+	newPriceWithTax := 2200
+	newPriceWithoutTax := 2000
+	newTaxRate := 10.0
+	newCurrency := "JPY"
+
+	req := request.UpdateItemRequest{
+		ItemId:          "f47ac10b-58cc-4372-a567-0e02b2c3d401",
+		ItemName:        "Updated Item",
+		Stock:           false,
+		Description:     "Updated Description",
+		PriceWithTax:    &newPriceWithTax,
+		PriceWithoutTax: &newPriceWithoutTax,
+		TaxRate:         &newTaxRate,
+		Currency:        &newCurrency,
+	}
+
+	itemId, _ := domain.NewItemId(req.ItemId)
+	userId, _ := domain.NewUserId("f47ac10b-58cc-4372-a567-0e02b2c3d400")
+	existingItemName, _ := domain.NewItemName("Existing Item")
+	existingStock, _ := domain.NewStock(true)
+	existingDescription, _ := domain.NewDescription("Existing Description")
+	existingItem, _ := domain.NewItem(itemId, *userId, *existingItemName, *existingStock, *existingDescription)
+
+	updatedItemName, _ := domain.NewItemName(req.ItemName)
+	updatedStock, _ := domain.NewStock(req.Stock)
+	updatedDescription, _ := domain.NewDescription(req.Description)
+	updatedItem, _ := domain.NewItem(itemId, *userId, *updatedItemName, *updatedStock, *updatedDescription)
+
+
+	mockItemRepo.On("GetItemByID", itemId).Return(existingItem, nil)
+	mockItemRepo.On("UpdateItem", mock.AnythingOfType("*domain.Item")).Return(updatedItem, nil)
+	
+	mockPriceRepo.On("UpdateByItemId", mock.Anything, req.ItemId, mock.MatchedBy(func(price *domain.Price) bool {
+		return price.PriceWithTax() == newPriceWithTax &&
+			price.PriceWithoutTax() == newPriceWithoutTax &&
+			price.TaxRate() == newTaxRate &&
+			price.Currency() == newCurrency
+	})).Return(nil)
+
+	result, err := uc.UpdateItem(req)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	mockItemRepo.AssertExpectations(t)
+	mockPriceRepo.AssertExpectations(t)
+
+	assert.NotEqual(t, oldPriceWithTax, newPriceWithTax, "価格が更新されていること")
+	assert.NotEqual(t, oldPriceWithoutTax, newPriceWithoutTax, "税抜価格が更新されていること")
+}
+
+func TestUpdateItem_WithPrice_PriceUpdateFails(t *testing.T) {
+	mockItemRepo := new(MockItemRepository)
+	mockPriceRepo := new(MockPriceRepository)
+	uc := NewItemUsecase(mockItemRepo, mockPriceRepo)
+
+	priceWithTax := 2200
+	priceWithoutTax := 2000
+	taxRate := 10.0
+	currency := "JPY"
+
+	req := request.UpdateItemRequest{
+		ItemId:          "f47ac10b-58cc-4372-a567-0e02b2c3d401",
+		ItemName:        "Updated Item",
+		Stock:           false,
+		Description:     "Updated Description",
+		PriceWithTax:    &priceWithTax,
+		PriceWithoutTax: &priceWithoutTax,
+		TaxRate:         &taxRate,
+		Currency:        &currency,
+	}
+
+	itemId, _ := domain.NewItemId(req.ItemId)
+	userId, _ := domain.NewUserId("f47ac10b-58cc-4372-a567-0e02b2c3d400")
+	existingItemName, _ := domain.NewItemName("Existing Item")
+	existingStock, _ := domain.NewStock(true)
+	existingDescription, _ := domain.NewDescription("Existing Description")
+	existingItem, _ := domain.NewItem(itemId, *userId, *existingItemName, *existingStock, *existingDescription)
+
+	updatedItemName, _ := domain.NewItemName(req.ItemName)
+	updatedStock, _ := domain.NewStock(req.Stock)
+	updatedDescription, _ := domain.NewDescription(req.Description)
+	updatedItem, _ := domain.NewItem(itemId, *userId, *updatedItemName, *updatedStock, *updatedDescription)
+
+	mockItemRepo.On("GetItemByID", itemId).Return(existingItem, nil)
+	mockItemRepo.On("UpdateItem", mock.AnythingOfType("*domain.Item")).Return(updatedItem, nil)
+	mockPriceRepo.On("UpdateByItemId", mock.Anything, req.ItemId, mock.AnythingOfType("*domain.Price")).Return(errors.New("price update failed"))
+
+	result, err := uc.UpdateItem(req)
+
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	assert.Equal(t, "price update failed", err.Error())
+	mockItemRepo.AssertExpectations(t)
+	mockPriceRepo.AssertExpectations(t)
+}
+
 func TestDeleteItem_Success(t *testing.T) {
 	mockItemRepo := new(MockItemRepository)
 	mockPriceRepo := new(MockPriceRepository)
