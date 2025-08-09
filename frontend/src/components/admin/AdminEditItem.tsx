@@ -16,6 +16,9 @@ interface ItemFormData {
   item_name: string;
   stock: boolean;
   description: string;
+  price_without_tax?: number;
+  tax_rate?: number;
+  currency?: string;
 }
 
 interface AdminEditItemProps {
@@ -33,6 +36,9 @@ const AdminEditItem: React.FC<AdminEditItemProps> = ({
     item_name: "",
     stock: true,
     description: "",
+    price_without_tax: undefined,
+    tax_rate: 10,
+    currency: "JPY",
   });
 
   const [loading, setLoading] = useState(false);
@@ -50,6 +56,9 @@ const AdminEditItem: React.FC<AdminEditItemProps> = ({
           item_name: item.item_name,
           stock: item.stock,
           description: item.description,
+          price_without_tax: item.price_without_tax,
+          tax_rate: item.tax_rate || 10,
+          currency: item.currency || "JPY",
         });
         setError(null);
       } else {
@@ -108,6 +117,16 @@ const AdminEditItem: React.FC<AdminEditItemProps> = ({
         ...prev,
         [name]: checkbox.checked,
       }));
+    } else if (name === "price_without_tax") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value ? parseInt(value, 10) : undefined,
+      }));
+    } else if (name === "tax_rate") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value ? parseFloat(value) : undefined,
+      }));
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -165,6 +184,36 @@ const AdminEditItem: React.FC<AdminEditItemProps> = ({
               onChange={handleChange}
               placeholder="商品の説明を入力してください"
               rows={4}
+            />
+          </Field>
+
+          <Field label="税抜き価格">
+            <Input
+              name="price_without_tax"
+              type="number"
+              value={formData.price_without_tax || ""}
+              onChange={handleChange}
+              placeholder="税抜き価格を入力してください"
+            />
+          </Field>
+
+          <Field label="税率 (%)">
+            <Input
+              name="tax_rate"
+              type="number"
+              step="0.1"
+              value={formData.tax_rate || 10}
+              onChange={handleChange}
+              placeholder="税率を入力してください"
+            />
+          </Field>
+
+          <Field label="通貨">
+            <Input
+              name="currency"
+              value={formData.currency || ""}
+              onChange={handleChange}
+              placeholder="通貨を入力してください"
             />
           </Field>
 
