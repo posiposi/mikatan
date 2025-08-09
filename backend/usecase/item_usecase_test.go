@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -48,11 +49,55 @@ func (m *MockItemRepository) DeleteItem(itemId *domain.ItemId) error {
 	return args.Error(0)
 }
 
+type MockPriceRepository struct {
+	mock.Mock
+}
+
+func (m *MockPriceRepository) Create(ctx context.Context, price *domain.Price) error {
+	args := m.Called(ctx, price)
+	return args.Error(0)
+}
+
+func (m *MockPriceRepository) FindById(ctx context.Context, priceId string) (*domain.Price, error) {
+	args := m.Called(ctx, priceId)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.Price), args.Error(1)
+}
+
+func (m *MockPriceRepository) FindByItemId(ctx context.Context, itemId string) ([]*domain.Price, error) {
+	args := m.Called(ctx, itemId)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*domain.Price), args.Error(1)
+}
+
+func (m *MockPriceRepository) FindCurrentByItemId(ctx context.Context, itemId string) (*domain.Price, error) {
+	args := m.Called(ctx, itemId)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.Price), args.Error(1)
+}
+
+func (m *MockPriceRepository) UpdateByItemId(ctx context.Context, itemId string, price *domain.Price) error {
+	args := m.Called(ctx, itemId, price)
+	return args.Error(0)
+}
+
+func (m *MockPriceRepository) Delete(ctx context.Context, priceId string) error {
+	args := m.Called(ctx, priceId)
+	return args.Error(0)
+}
+
 func TestGetAllItems_ReturnsItems(t *testing.T) {
-	mockRepo := new(MockItemRepository)
-	uc := NewItemUsecase(mockRepo)
+	mockItemRepo := new(MockItemRepository)
+	mockPriceRepo := new(MockPriceRepository)
+	uc := NewItemUsecase(mockItemRepo, mockPriceRepo)
 	result := domain.Items{}
-	mockRepo.On("GetAllItems").Return(result, nil)
+	mockItemRepo.On("GetAllItems").Return(result, nil)
 	items, err := uc.GetAllItems()
 	expected := []*domain.Item{}
 	assert.NoError(t, err)
@@ -60,8 +105,9 @@ func TestGetAllItems_ReturnsItems(t *testing.T) {
 }
 
 func TestCreateItem_Success(t *testing.T) {
-	mockRepo := new(MockItemRepository)
-	uc := NewItemUsecase(mockRepo)
+	mockItemRepo := new(MockItemRepository)
+	mockPriceRepo := new(MockPriceRepository)
+	uc := NewItemUsecase(mockItemRepo, mockPriceRepo)
 
 	req := request.CreateItemRequest{
 		ItemName:    "Test Item",
@@ -76,7 +122,7 @@ func TestCreateItem_Success(t *testing.T) {
 	description, _ := domain.NewDescription(req.Description)
 	domainItem, _ := domain.NewItem(itemId, *userIdValue, *itemName, *stock, *description)
 
-	mockRepo.On("CreateItem", mock.AnythingOfType("*domain.Item")).Return(domainItem, nil)
+	mockItemRepo.On("CreateItem", mock.AnythingOfType("*domain.Item")).Return(domainItem, nil)
 	result, err := uc.CreateItem(req)
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
@@ -84,12 +130,91 @@ func TestCreateItem_Success(t *testing.T) {
 	assert.Equal(t, domainItem.ItemName(), result.ItemName())
 	assert.Equal(t, domainItem.Stock(), result.Stock())
 	assert.Equal(t, domainItem.Description(), result.Description())
-	mockRepo.AssertExpectations(t)
+	mockItemRepo.AssertExpectations(t)
+}
+
+func TestCreateItem_WithPrice_Success(t *testing.T) {
+	mockItemRepo := new(MockItemRepository)
+	mockPriceRepo := new(MockPriceRepository)
+	uc := NewItemUsecase(mockItemRepo, mockPriceRepo)
+
+	priceWithTax := 1100
+	priceWithoutTax := 1000
+	taxRate := 10.0
+	currency := "JPY"
+
+	req := request.CreateItemRequest{
+		ItemName:        "Test Item",
+		Stock:           true,
+		Description:     "Test Description",
+		UserId:          "f47ac10b-58cc-4372-a567-0e02b2c3d400",
+		PriceWithTax:    &priceWithTax,
+		PriceWithoutTax: &priceWithoutTax,
+		TaxRate:         &taxRate,
+		Currency:        &currency,
+	}
+
+	itemId, _ := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d401")
+	userIdValue, _ := domain.NewUserId(req.UserId)
+	itemName, _ := domain.NewItemName(req.ItemName)
+	stock, _ := domain.NewStock(req.Stock)
+	description, _ := domain.NewDescription(req.Description)
+	domainItem, _ := domain.NewItem(itemId, *userIdValue, *itemName, *stock, *description)
+
+	mockItemRepo.On("CreateItem", mock.AnythingOfType("*domain.Item")).Return(domainItem, nil)
+	mockPriceRepo.On("Create", mock.Anything, mock.AnythingOfType("*domain.Price")).Return(nil)
+
+	result, err := uc.CreateItem(req)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, domainItem.ItemId(), result.ItemId())
+	mockItemRepo.AssertExpectations(t)
+	mockPriceRepo.AssertExpectations(t)
+}
+
+func TestCreateItem_WithPrice_PriceCreationFails(t *testing.T) {
+	mockItemRepo := new(MockItemRepository)
+	mockPriceRepo := new(MockPriceRepository)
+	uc := NewItemUsecase(mockItemRepo, mockPriceRepo)
+
+	priceWithTax := 1100
+	priceWithoutTax := 1000
+	taxRate := 10.0
+	currency := "JPY"
+
+	req := request.CreateItemRequest{
+		ItemName:        "Test Item",
+		Stock:           true,
+		Description:     "Test Description",
+		UserId:          "f47ac10b-58cc-4372-a567-0e02b2c3d400",
+		PriceWithTax:    &priceWithTax,
+		PriceWithoutTax: &priceWithoutTax,
+		TaxRate:         &taxRate,
+		Currency:        &currency,
+	}
+
+	itemId, _ := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d401")
+	userIdValue, _ := domain.NewUserId(req.UserId)
+	itemName, _ := domain.NewItemName(req.ItemName)
+	stock, _ := domain.NewStock(req.Stock)
+	description, _ := domain.NewDescription(req.Description)
+	domainItem, _ := domain.NewItem(itemId, *userIdValue, *itemName, *stock, *description)
+
+	mockItemRepo.On("CreateItem", mock.AnythingOfType("*domain.Item")).Return(domainItem, nil)
+	mockPriceRepo.On("Create", mock.Anything, mock.AnythingOfType("*domain.Price")).Return(errors.New("price creation failed"))
+
+	result, err := uc.CreateItem(req)
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	assert.Equal(t, "price creation failed", err.Error())
+	mockItemRepo.AssertExpectations(t)
+	mockPriceRepo.AssertExpectations(t)
 }
 
 func TestCreateItem_InvalidItemName(t *testing.T) {
-	mockRepo := new(MockItemRepository)
-	uc := NewItemUsecase(mockRepo)
+	mockItemRepo := new(MockItemRepository)
+	mockPriceRepo := new(MockPriceRepository)
+	uc := NewItemUsecase(mockItemRepo, mockPriceRepo)
 
 	req := request.CreateItemRequest{
 		ItemName:    "",
@@ -102,12 +227,13 @@ func TestCreateItem_InvalidItemName(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "value count must be greater than 0")
-	mockRepo.AssertNotCalled(t, "CreateItem")
+	mockItemRepo.AssertNotCalled(t, "CreateItem")
 }
 
 func TestCreateItem_InvalidUserId(t *testing.T) {
-	mockRepo := new(MockItemRepository)
-	uc := NewItemUsecase(mockRepo)
+	mockItemRepo := new(MockItemRepository)
+	mockPriceRepo := new(MockPriceRepository)
+	uc := NewItemUsecase(mockItemRepo, mockPriceRepo)
 
 	req := request.CreateItemRequest{
 		ItemName:    "Test Item",
@@ -120,12 +246,13 @@ func TestCreateItem_InvalidUserId(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Contains(t, err.Error(), "invalid UUID")
-	mockRepo.AssertNotCalled(t, "CreateItem")
+	mockItemRepo.AssertNotCalled(t, "CreateItem")
 }
 
 func TestCreateItem_RepositoryError(t *testing.T) {
-	mockRepo := new(MockItemRepository)
-	uc := NewItemUsecase(mockRepo)
+	mockItemRepo := new(MockItemRepository)
+	mockPriceRepo := new(MockPriceRepository)
+	uc := NewItemUsecase(mockItemRepo, mockPriceRepo)
 
 	req := request.CreateItemRequest{
 		ItemName:    "Test Item",
@@ -133,18 +260,19 @@ func TestCreateItem_RepositoryError(t *testing.T) {
 		Description: "Test Description",
 		UserId:      "f47ac10b-58cc-4372-a567-0e02b2c3d400",
 	}
-	mockRepo.On("CreateItem", mock.AnythingOfType("*domain.Item")).Return(nil, errors.New("database error"))
+	mockItemRepo.On("CreateItem", mock.AnythingOfType("*domain.Item")).Return(nil, errors.New("database error"))
 	result, err := uc.CreateItem(req)
 
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Equal(t, "database error", err.Error())
-	mockRepo.AssertExpectations(t)
+	mockItemRepo.AssertExpectations(t)
 }
 
 func TestGetItemByID_Success(t *testing.T) {
-	mockRepo := new(MockItemRepository)
-	uc := NewItemUsecase(mockRepo)
+	mockItemRepo := new(MockItemRepository)
+	mockPriceRepo := new(MockPriceRepository)
+	uc := NewItemUsecase(mockItemRepo, mockPriceRepo)
 
 	itemId, _ := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d401")
 	userId, _ := domain.NewUserId("f47ac10b-58cc-4372-a567-0e02b2c3d400")
@@ -154,18 +282,19 @@ func TestGetItemByID_Success(t *testing.T) {
 	domainItem, _ := domain.NewItem(itemId, *userId, *itemName, *stock, *description)
 
 	itemIdValue, _ := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d401")
-	mockRepo.On("GetItemByID", itemIdValue).Return(domainItem, nil)
+	mockItemRepo.On("GetItemByID", itemIdValue).Return(domainItem, nil)
 	result, err := uc.GetItemByID("f47ac10b-58cc-4372-a567-0e02b2c3d401")
 
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, domainItem, result)
-	mockRepo.AssertExpectations(t)
+	mockItemRepo.AssertExpectations(t)
 }
 
 func TestUpdateItem_Success(t *testing.T) {
-	mockRepo := new(MockItemRepository)
-	uc := NewItemUsecase(mockRepo)
+	mockItemRepo := new(MockItemRepository)
+	mockPriceRepo := new(MockPriceRepository)
+	uc := NewItemUsecase(mockItemRepo, mockPriceRepo)
 
 	req := request.UpdateItemRequest{
 		ItemId:      "f47ac10b-58cc-4372-a567-0e02b2c3d401",
@@ -186,23 +315,24 @@ func TestUpdateItem_Success(t *testing.T) {
 	updatedDescription, _ := domain.NewDescription(req.Description)
 	updatedItem, _ := domain.NewItem(itemId, *userId, *updatedItemName, *updatedStock, *updatedDescription)
 
-	mockRepo.On("GetItemByID", itemId).Return(existingItem, nil)
-	mockRepo.On("UpdateItem", mock.AnythingOfType("*domain.Item")).Return(updatedItem, nil)
+	mockItemRepo.On("GetItemByID", itemId).Return(existingItem, nil)
+	mockItemRepo.On("UpdateItem", mock.AnythingOfType("*domain.Item")).Return(updatedItem, nil)
 	result, err := uc.UpdateItem(req)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
-	mockRepo.AssertExpectations(t)
+	mockItemRepo.AssertExpectations(t)
 }
 
 func TestDeleteItem_Success(t *testing.T) {
-	mockRepo := new(MockItemRepository)
-	uc := NewItemUsecase(mockRepo)
+	mockItemRepo := new(MockItemRepository)
+	mockPriceRepo := new(MockPriceRepository)
+	uc := NewItemUsecase(mockItemRepo, mockPriceRepo)
 
 	itemIdValue, _ := domain.NewItemId("f47ac10b-58cc-4372-a567-0e02b2c3d401")
-	mockRepo.On("DeleteItem", itemIdValue).Return(nil)
+	mockItemRepo.On("DeleteItem", itemIdValue).Return(nil)
 	err := uc.DeleteItem("f47ac10b-58cc-4372-a567-0e02b2c3d401")
 
 	assert.NoError(t, err)
-	mockRepo.AssertExpectations(t)
+	mockItemRepo.AssertExpectations(t)
 }

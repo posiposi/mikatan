@@ -52,9 +52,12 @@ func (aic *adminItemController) GetItemByID(c echo.Context) error {
 
 func (aic *adminItemController) CreateItem(c echo.Context) error {
 	var req struct {
-		ItemName    string `json:"item_name" validate:"required"`
-		Stock       bool   `json:"stock"`
-		Description string `json:"description"`
+		ItemName        string   `json:"item_name" validate:"required"`
+		Stock           bool     `json:"stock"`
+		Description     string   `json:"description"`
+		PriceWithoutTax *int     `json:"price_without_tax"`
+		TaxRate         *float64 `json:"tax_rate"`
+		Currency        *string  `json:"currency"`
 	}
 	
 	if err := c.Bind(&req); err != nil {
@@ -70,10 +73,19 @@ func (aic *adminItemController) CreateItem(c echo.Context) error {
 	}
 
 	createReq := request.CreateItemRequest{
-		ItemName:    req.ItemName,
-		Stock:       req.Stock,
-		Description: req.Description,
-		UserId:      userId,
+		ItemName:        req.ItemName,
+		Stock:           req.Stock,
+		Description:     req.Description,
+		UserId:          userId,
+		PriceWithoutTax: req.PriceWithoutTax,
+		TaxRate:         req.TaxRate,
+		Currency:        req.Currency,
+	}
+
+	// 税込み料金を計算
+	if req.PriceWithoutTax != nil && req.TaxRate != nil {
+		priceWithTax := int(float64(*req.PriceWithoutTax) * (1 + *req.TaxRate/100))
+		createReq.PriceWithTax = &priceWithTax
 	}
 
 	createdItem, err := aic.iu.CreateItem(createReq)
